@@ -3,5 +3,5 @@
   <rect x="1" y="1" width="278" height="74" rx="12" fill="#ffd480" stroke="#ffb64e" stroke-width="2"/>
   <path d="M69 16v22l18-11z" fill="#262132"/>
   <text x="104" y="36" fill="#262132" font-family="system-ui, sans-serif" font-size="25" font-weight="700">Play Now</text>
-  <text x="140" y="58" fill="#483624" font-family="system-ui, sans-serif" font-size="14" font-weight="650" text-anchor="middle">v0.1.11 · Alpha</text>
+  <text x="140" y="58" fill="#483624" font-family="system-ui, sans-serif" font-size="14" font-weight="650" text-anchor="middle">v0.1.12 · Alpha</text>
 </svg>

@@ -32,6 +32,11 @@
     <div class="bar-inner">
       <button id="soundtrack-toggle" class="wordmark-toggle" type="button" aria-label="Play FoxVex soundtrack">
         <img class="wordmark" src="/src/assets/foxvex-wordmark.png" width="720" height="240" alt="">
+        <svg class="wordmark-pause" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+          <circle cx="11" cy="11" r="10.5" fill="#131826" fill-opacity=".94" stroke="currentColor"/>
+          <rect x="7.4" y="6.6" width="2.7" height="8.8" rx=".65" fill="currentColor"/>
+          <rect x="11.9" y="6.6" width="2.7" height="8.8" rx=".65" fill="currentColor"/>
+        </svg>
       </button>
       <div class="header-actions" role="group" aria-label="Puzzle controls">
         <button id="undo" type="button" disabled>Undo</button>
@@ -145,6 +150,18 @@
     </header>
     <div class="settings-content">
     <div class="setting-group">
+      <label for="soundtrack-mode">Soundtrack</label>
+      <select id="soundtrack-mode" aria-describedby="soundtrack-help">
+        <option value="sequential">Repeat (Sequential)</option>
+        <option value="random" selected>Repeat (Random)</option>
+        <option value="off">Off</option>
+      </select>
+      <label class="soundtrack-track-label" for="soundtrack-track">Track</label>
+      <select id="soundtrack-track"></select>
+      <p id="soundtrack-help">Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.</p>
+      <p id="soundtrack-status" role="status" hidden></p>
+    </div>
+    <div class="setting-group">
       <label for="matching-assistant">Matching Assistant</label>
       <select id="matching-assistant" aria-describedby="placement-help">
         <option value="prevent">Prevent mismatches</option>
@@ -183,18 +200,6 @@
         <option value="fit" selected>Fit screen with smaller tiles</option>
       </select>
       <p id="layout-help">Choose larger tiles with scrolling or let tiles shrink further to fit more of the puzzle on screen.</p>
-    </div>
-    <div class="setting-group">
-      <label for="soundtrack-mode">Soundtrack</label>
-      <select id="soundtrack-mode" aria-describedby="soundtrack-help">
-        <option value="sequential">Repeat (Sequential)</option>
-        <option value="random" selected>Repeat (Random)</option>
-        <option value="off">Off</option>
-      </select>
-      <label class="soundtrack-track-label" for="soundtrack-track">Track</label>
-      <select id="soundtrack-track"></select>
-      <p id="soundtrack-help">Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.</p>
-      <p id="soundtrack-status" role="status" hidden></p>
     </div>
     <details class="setting-group">
       <summary>How to Play</summary>

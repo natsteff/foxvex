@@ -32,6 +32,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   function updateToggleLabel() {
     const action = mode.value === 'off' ? 'Enable' : audio.paused ? 'Play' : 'Pause';
     toggle.setAttribute('aria-label', `${action} FoxVex soundtrack`);
+    toggle.toggleAttribute('data-paused', pausedByPlayer);
   }
 
   function updateControls() {
