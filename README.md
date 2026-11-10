@@ -52,7 +52,7 @@ The 3×3 puzzle with Cheat Mode enabled, Matching Assistant set to Highlight mis
 | --- | --- | --- |
 | Move or swap a tile | Drag and drop | Tab between grids, use arrows to focus a slot, and press Enter or Space to pick up or drop |
 | Cancel a move | Release outside the grids | Escape |
-| Mark or unmark a placed tile | Double-tap or double-click it | Focus the tile and press M |
+| Toggle **Lock In** or **Pencil In**, as selected in Settings | Double-tap or double-click a placed tile | Focus a placed tile and press M |
 | Undo, check, or reveal the solution | Use the puzzle toolbar | Tab to a toolbar control and press Enter |
 
 Tiles keep their orientation. A move into an occupied slot swaps the two tiles. **Matching Assistant** in Settings lets you prevent mismatches, highlight them in red (the default), or leave them unmarked. When Matching Assistant is **Off**, use **Check** to see whether any touching numbers differ.
