@@ -25,11 +25,6 @@
     </div>
   </header>
   <main>
-    <section class="intro" aria-labelledby="title">
-      <p class="eyebrow">EDGE-MATCHING PUZZLE</p>
-      <h1 id="title">Match the edges.</h1>
-      <p class="instructions">Drag tiles to match touching numbers.</p>
-    </section>
     <div class="toolbar" aria-label="Puzzle controls">
       <div class="toolbar-group">
         <label class="size-control"><span>Size</span>
@@ -47,13 +42,19 @@
         </label>
         <button id="new" class="primary" type="button"><span aria-hidden="true">+</span> New puzzle</button>
       </div>
-      <div class="toolbar-group">
-        <button id="undo" type="button" disabled>Undo</button>
-        <button id="check" type="button">Check</button>
-        <button id="solve" type="button">Solve</button>
+      <div class="play-controls">
+        <div class="toolbar-group">
+          <button id="undo" type="button" disabled>Undo</button>
+          <button id="check" type="button">Check</button>
+          <button id="solve" type="button">Solve</button>
+        </div>
+        <div class="game-info">
+          <p id="status" role="status"></p>
+          <p id="moves" class="move-count"></p>
+        </div>
       </div>
     </div>
-    <div id="rotate-note" class="rotate-note" hidden>Rotate your phone to landscape, or choose Scroll in Settings.</div>
+    <div id="rotate-note" class="rotate-note" hidden>Rotate your phone to landscape, or choose Fit screen or Scroll in Settings.</div>
     <div id="arena" class="arena">
       <section class="panel" aria-labelledby="board-label">
         <header class="panel-heading">
@@ -75,10 +76,6 @@
       </section>
       <div id="render-layer" aria-hidden="true"></div>
     </div>
-    <footer class="game-footer">
-      <p id="status" role="status"></p>
-      <p id="moves" class="move-count"></p>
-    </footer>
   </main>
   <dialog id="settings-dialog" aria-labelledby="settings-heading">
     <h2 id="settings-heading">Settings</h2>
@@ -93,16 +90,21 @@
     </div>
     <div class="setting-group">
       <label class="cheat-setting"><input id="cheat-mode" type="checkbox" aria-describedby="cheat-help"> Cheat Mode</label>
-      <p id="cheat-help">Outlines tray tiles in cyan and marks the sides that must face out because they have no match.</p>
+      <p id="cheat-help">Outlines tiles in cyan and marks the sides that must face out because they have no match.</p>
     </div>
     <div class="setting-group">
-      <label for="small-layout">On very small portrait screens</label>
+      <label for="small-layout">Small-screen layout</label>
       <select id="small-layout" aria-describedby="layout-help">
         <option value="scroll">Scroll to see the full puzzle</option>
+        <option value="fit">Fit screen with smaller tiles</option>
         <option value="landscape">Rotate to landscape</option>
       </select>
-      <p id="layout-help">On wider screens the play area and tray sit side by side.</p>
+      <p id="layout-help">Fit screen lets tiles shrink further. Scroll keeps tiles larger when space is tight. Rotate prompts for landscape on very small portrait screens.</p>
     </div>
+    <details class="setting-group">
+      <summary>How to Play</summary>
+      <p>Drag tiles onto the board so the numbers on touching sides match. Drop onto an occupied square to swap tiles.</p>
+    </details>
     <form method="dialog"><button class="primary">Done</button></form>
   </dialog>
   <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">

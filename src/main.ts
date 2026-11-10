@@ -29,6 +29,7 @@ const placementHelp = document.querySelector<HTMLParagraphElement>('#placement-h
 const cheatMode = document.querySelector<HTMLInputElement>('#cheat-mode')!;
 const edgeTileLegend = document.querySelector<HTMLParagraphElement>('#edge-tile-legend')!;
 const rotateNote = document.querySelector<HTMLDivElement>('#rotate-note')!;
+const stackedLayout = matchMedia('(max-width: 699px) and (orientation: portrait)');
 const smallPortrait = matchMedia('(orientation: portrait) and ((max-width: 349px) or (max-height: 619px))');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const areas = ['board', 'tray'] as const;
@@ -88,13 +89,14 @@ type ReturnAnimation = {
 const restored = savedPuzzle();
 let puzzle = restored ?? newPuzzle(4, 'normal');
 let conflictedSlots = new Set<number>();
-const trayEdgeHints = new Map<number, Side[]>();
+const edgeHintsByTile = new Map<number, Side[]>();
 const history: Puzzle[] = [];
 let cells: Record<Area, HTMLButtonElement[]> = { board: [], tray: [] };
 let selected: Slot | null = null;
 let drag: Drag | null = null;
 let returning: ReturnAnimation | null = null;
 let animationFrame = 0;
+let layoutFrame = 0;
 let ready = false;
 
 const scene = new TileRenderer(() => {
@@ -139,7 +141,7 @@ function showMismatch({ area, index }: Slot) {
 function tileDecoration(slot: Slot, id: number) {
   return {
     outlineColor: showMismatch(slot) ? 0xf13447 : undefined,
-    edgeHints: slot.area === 'tray' ? trayEdgeHints.get(id) : undefined,
+    edgeHints: edgeHintsByTile.get(id),
   };
 }
 
@@ -161,7 +163,7 @@ function draw(time: number) {
       }
     });
   }
-  if (drag) scene.place(drag.id, drag.position, { raised: true });
+  if (drag) scene.place(drag.id, drag.position, { raised: true, edgeHints: edgeHintsByTile.get(drag.id) });
   if (returning) {
     const end = positionOf(returning.to);
     const progress = Math.min(1, Math.max(0, (time - returning.started) / 155));
@@ -171,7 +173,9 @@ function draw(time: number) {
       x: x + (end.x - x) * eased,
       y: y + (end.y - y) * eased,
       size: size + (end.size - size) * eased,
-    }, progress === 1 ? tileDecoration(returning.to, returning.id) : { raised: true });
+    }, progress === 1 ? tileDecoration(returning.to, returning.id) : {
+      raised: true, edgeHints: edgeHintsByTile.get(returning.id),
+    });
     if (progress === 1) returning = null;
     else scheduleDraw();
   }
@@ -187,18 +191,43 @@ function puzzleDescription(size: Size, difficulty?: Difficulty) {
 }
 
 function resize() {
+  if (!arena.hidden) {
+    const rect = arena.getBoundingClientRect();
+    const boardHeight = grids.board.getBoundingClientRect().height;
+    const trayHeight = grids.tray.getBoundingClientRect().height;
+    const stacked = stackedLayout.matches;
+    const gridHeight = stacked ? boardHeight + trayHeight : Math.max(boardHeight, trayHeight);
+    const panelSpace = rect.height - gridHeight;
+    const pageTop = rect.top + window.scrollY;
+    const bottomPadding = parseFloat(getComputedStyle(arena.parentElement!).paddingBottom);
+    const visual = window.visualViewport;
+    const viewportHeight = visual?.scale === 1 ? Math.min(innerHeight, visual.height) : innerHeight;
+    const available = Math.floor((viewportHeight - pageTop - panelSpace - bottomPadding) / (stacked ? 2 : 1));
+    const minimumTile = smallLayout.value === 'fit' ? 26 : stacked ? 39 : 35;
+    const minimumGrid = puzzle.size * minimumTile + (puzzle.size - 1) * 6;
+    const gridSize = Math.min(430, Math.max(available, minimumGrid));
+    arena.style.setProperty('--grid-max', `${gridSize}px`);
+  }
   if (ready) scene.resize(layer.clientWidth, layer.clientHeight);
   scheduleDraw();
+}
+
+function scheduleLayout() {
+  if (layoutFrame) return;
+  layoutFrame = requestAnimationFrame(() => {
+    layoutFrame = 0;
+    resize();
+  });
 }
 
 function render() {
   conflictedSlots = new Set(mismatchedEdges(puzzle).flat());
   edgeTileLegend.hidden = !cheatMode.checked;
-  trayEdgeHints.clear();
+  edgeHintsByTile.clear();
   if (cheatMode.checked) {
     puzzle.tiles.forEach((_, id) => {
       const sides = unmatchedSides(puzzle.tiles, id);
-      if (sides.length) trayEdgeHints.set(id, sides);
+      if (sides.length) edgeHintsByTile.set(id, sides);
     });
   }
   const total = puzzle.tiles.length;
@@ -228,7 +257,7 @@ function render() {
       if (id === null) cell.setAttribute('aria-label', `${where}, empty`);
       else {
         const { north, east, south, west } = puzzle.tiles[id];
-        const sides = area === 'tray' ? trayEdgeHints.get(id) : undefined;
+        const sides = edgeHintsByTile.get(id);
         const hint = sides ? `, edge tile, unmatched ${sides.join(', ')}` : '';
         const conflict = showMismatch({ area, index }) ? ', mismatched edge' : '';
         cell.setAttribute('aria-label', `${where}, tile, top ${north}, right ${east}, bottom ${south}, left ${west}${hint}${conflict}`);
@@ -244,7 +273,7 @@ function render() {
   progress.textContent = `${placed} / ${total} placed`;
   remaining.textContent = `${total - placed} remaining`;
   moveCount.textContent = `${puzzle.moves} ${puzzle.moves === 1 ? 'move' : 'moves'}`;
-  scheduleDraw();
+  scheduleLayout();
 }
 
 function commit(next: Puzzle, message: string) {
@@ -266,7 +295,7 @@ function clearTarget() {
 }
 
 function scrollWithDrag() {
-  if (!drag?.touch || !smallPortrait.matches) return;
+  if (!drag?.touch || document.documentElement.scrollHeight <= innerHeight) return;
   const edge = 55;
   const height = window.innerHeight;
   const step = drag.y < edge ? -6 : drag.y > height - edge ? 6 : 0;
@@ -296,7 +325,7 @@ function updateSmallLayout() {
   if (landscapeRequested) endDrag();
   arena.hidden = landscapeRequested;
   rotateNote.hidden = !landscapeRequested;
-  scheduleDraw();
+  scheduleLayout();
 }
 
 function confirmAction(title: string, message: string, label: string, action: () => void) {
@@ -417,12 +446,15 @@ function cancelPointer(event: PointerEvent) {
 arena.addEventListener('pointercancel', cancelPointer);
 arena.addEventListener('lostpointercapture', cancelPointer);
 window.addEventListener('blur', () => endDrag());
-window.addEventListener('resize', resize);
+window.addEventListener('resize', scheduleLayout);
+window.visualViewport?.addEventListener('resize', scheduleLayout);
 window.addEventListener('scroll', () => {
   highlightTarget();
   scheduleDraw();
 }, { passive: true });
-new ResizeObserver(scheduleDraw).observe(arena);
+const layoutObserver = new ResizeObserver(scheduleLayout);
+layoutObserver.observe(arena);
+layoutObserver.observe(document.querySelector('.toolbar')!);
 
 arena.addEventListener('click', event => {
   if (event.detail !== 0 || drag) return;
@@ -525,7 +557,8 @@ cheatMode.addEventListener('change', () => {
   write(cheatModeKey, String(cheatMode.checked));
   render();
 });
-smallLayout.value = read(layoutKey) === 'landscape' ? 'landscape' : 'scroll';
+const savedLayout = read(layoutKey);
+smallLayout.value = savedLayout === 'landscape' || savedLayout === 'fit' ? savedLayout : 'scroll';
 smallLayout.addEventListener('change', () => {
   write(layoutKey, smallLayout.value);
   updateSmallLayout();

@@ -109,8 +109,11 @@ export class TileRenderer extends Phaser.Scene {
     face.fillStyle(palette[west - 1]).fillTriangle(0, size, 0, 0, middle, middle);
     face.lineStyle(1, 0x131826, .33)
       .lineBetween(0, 0, size, size).lineBetween(size, 0, 0, size);
-    if (outlineColor !== undefined) face.lineStyle(3, outlineColor).strokeRect(1.5, 1.5, size - 3, size - 3);
     if (edgeHints) drawEdgeHint(face, size, edgeHints);
+    if (outlineColor !== undefined) {
+      const inset = edgeHints ? 4.5 : 1.5;
+      face.lineStyle(3, outlineColor).strokeRect(inset, inset, size - 2 * inset, size - 2 * inset);
+    }
     const positions = [[.5, .215], [.785, .5], [.5, .785], [.215, .5]];
     labels.forEach((label, index) => {
       const [labelX, labelY] = positions[index];
