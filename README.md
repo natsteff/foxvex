@@ -2,7 +2,7 @@
 
 <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
 
-**Version 0.1.2 · Alpha**
+**Version 0.1.3 · Alpha**
 
 <p align="center">
   <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
@@ -17,7 +17,7 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 - **Optional Cheat Mode** marks tiles that have an unmatched edge and must go on the border.
 - **Lock In and Pencil In** let you double-tap a placed tile to lock it in place or flag a tentative placement with a question mark.
 - **Local saves** let you resume a puzzle in the same browser, including locked and penciled-in tiles. You can also undo moves or reveal the solution.
-- **Puzzle completion** shows your move count and a **Next Puzzle** button.
+- **Puzzle completion** shows your move count and a **Next Puzzle** button. Solve in one move per tile to earn a perfect-game badge and confetti.
 
 FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. Landscape puts the tray on the left and the board on the right. Phone portrait stacks the board above the tray. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. Controller support and FOX Arcade validation are planned.
 

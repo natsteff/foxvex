@@ -87,8 +87,26 @@ main { padding-block: 10px 8px; }
 .victory-card h3, .victory-card p { margin: 0; }
 .victory-card h3 { font-size: 1rem; }
 .victory-card p { color: var(--muted); font-size: .8rem; }
+#victory-perfect { color: var(--accent); font-weight: 800; letter-spacing: .06em; }
 .victory-card button { pointer-events: auto; min-height: 36px; }
 .dragging .victory-card button { pointer-events: none; }
+#confetti { position: fixed; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; }
+#confetti span {
+  position: absolute;
+  top: -12px;
+  width: 7px;
+  height: 11px;
+  border-radius: 2px;
+  animation: confetti-fall linear both;
+}
+@keyframes confetti-fall {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  80% { opacity: 1; }
+  100% { transform: translate3d(var(--drift), calc(100vh + 24px), 0) rotate(540deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #confetti { visibility: hidden; }
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--size, 4), minmax(0, 1fr));

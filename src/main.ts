@@ -15,7 +15,9 @@ const undoButton = document.querySelector<HTMLButtonElement>('#undo')!;
 const checkButton = document.querySelector<HTMLButtonElement>('#check')!;
 const solveButton = document.querySelector<HTMLButtonElement>('#solve')!;
 const victory = document.querySelector<HTMLElement>('#victory')!;
+const victoryPerfect = document.querySelector<HTMLParagraphElement>('#victory-perfect')!;
 const victoryMoves = document.querySelector<HTMLParagraphElement>('#victory-moves')!;
+const confetti = document.querySelector<HTMLDivElement>('#confetti')!;
 const nextPuzzle = document.querySelector<HTMLButtonElement>('#next-puzzle')!;
 const status = document.querySelector<HTMLParagraphElement>('#status')!;
 const progress = document.querySelector<HTMLSpanElement>('#progress')!;
@@ -309,11 +311,30 @@ function render() {
   checkButton.disabled = solved;
   solveButton.disabled = solved;
   victory.hidden = !solved || puzzle.revealed;
+  victoryPerfect.hidden = victory.hidden || puzzle.moves !== total;
+  if (victoryPerfect.hidden && confetti.hasChildNodes()) confetti.replaceChildren();
   progress.textContent = `${placed} / ${total} placed`;
   remaining.textContent = `${total - placed} remaining`;
   moveCount.textContent = `${puzzle.moves} ${puzzle.moves === 1 ? 'move' : 'moves'}`;
   if (!victory.hidden) victoryMoves.textContent = moveCount.textContent;
   scheduleLayout();
+}
+
+function rainConfetti() {
+  if (reducedMotion.matches) return;
+
+  const colors = ['#ffd480', '#69eaf0', '#a6e9c7', '#ff9dc1', '#bcabff'];
+  const pieces = Array.from({ length: 48 }, (_, index) => {
+    const piece = document.createElement('span');
+    piece.style.left = `${(index + Math.random()) / 48 * 100}%`;
+    piece.style.backgroundColor = colors[index % colors.length];
+    piece.style.animationDelay = `${Math.random() * 0.9}s`;
+    piece.style.animationDuration = `${1.6 + Math.random()}s`;
+    piece.style.setProperty('--drift', `${(Math.random() - 0.5) * 120}px`);
+    piece.addEventListener('animationend', () => piece.remove(), { once: true });
+    return piece;
+  });
+  confetti.replaceChildren(...pieces);
 }
 
 function commit(next: Puzzle, message: string) {
@@ -326,9 +347,14 @@ function commit(next: Puzzle, message: string) {
   returning = null;
   save();
   render();
-  if (!wasShowingVictory && !victory.hidden) nextPuzzle.focus({ preventScroll: true });
+  if (!wasShowingVictory && !victory.hidden) {
+    nextPuzzle.focus({ preventScroll: true });
+    if (!victoryPerfect.hidden) rainConfetti();
+  }
   if (marking) announce(message);
-  else if (isSolved(puzzle) && !puzzle.revealed) announce('Puzzle solved!', 'success');
+  else if (!victory.hidden) {
+    announce(victoryPerfect.hidden ? 'Puzzle solved!' : 'Puzzle solved! Perfect game!', 'success');
+  }
   else if (matchingAssistant.value === 'highlight' && conflictedSlots.size) {
     announce(`${message} Check the red outlines.`, 'error');
   }

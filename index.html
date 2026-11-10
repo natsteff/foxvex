@@ -94,6 +94,7 @@
                 <path d="M7 4h10v6a5 5 0 0 1-10 0V4Zm0 2H3v2a4 4 0 0 0 4 4m10-6h4v2a4 4 0 0 1-4 4m-5 3v4m-4 2h8m-7-2h6" />
               </svg>
               <h3 id="victory-title">Puzzle solved!</h3>
+              <p id="victory-perfect" hidden>PERFECT GAME!!!</p>
               <p id="victory-moves"></p>
               <button id="next-puzzle" class="primary" type="button">Next Puzzle</button>
             </div>
@@ -104,6 +105,7 @@
       <div id="render-layer" aria-hidden="true"></div>
     </div>
   </main>
+  <div id="confetti" aria-hidden="true"></div>
   <dialog id="settings-dialog" aria-labelledby="settings-heading">
     <h2 id="settings-heading" tabindex="-1" autofocus>Settings</h2>
     <div class="setting-group">
