@@ -159,7 +159,19 @@ dialog {
 }
 dialog::backdrop { background: #070b15bd; }
 dialog h2 { margin: 0 0 14px; }
+#mobile-guide { border-color: var(--accent); max-height: calc(100% - 30px); overflow-y: auto; }
+#mobile-guide h2 { margin-bottom: 8px; font-size: 1.35rem; color: var(--accent); }
+#mobile-guide h3 { margin: 0; font-size: 1rem; }
+#mobile-guide p, #mobile-guide ol { font-size: .9rem; line-height: 1.45; }
+#mobile-guide ol { padding-inline-start: 1.35em; }
+#mobile-guide li + li { margin-top: 6px; }
+.mobile-guide-tip { border-top: 1px solid var(--line); padding-top: 12px; }
 #settings-heading:focus { outline: none; }
+#settings-dialog[open] { display: flex; flex-direction: column; max-height: calc(100% - 30px); }
+.settings-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.settings-header h2 { margin: 0; }
+.settings-content { overflow-y: auto; min-height: 0; }
+.soundtrack-track-label { margin-top: 12px; }
 dialog label { display: block; margin-bottom: 8px; }
 .setting-group + .setting-group { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
 .setting-group p { margin: 6px 0 0; }
@@ -171,7 +183,6 @@ dialog form, .dialog-actions { display: flex; justify-content: flex-end; gap: 8p
 .puzzle-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .puzzle-options select { width: 100%; }
 .dialog-actions { margin-top: 18px; }
-#settings-dialog form { margin-top: 18px; }
 .update-toggle, #check-updates { margin-top: 10px; }
 .update-toggle input { accent-color: var(--accent); }
 #startup-retry { color: var(--accent); }

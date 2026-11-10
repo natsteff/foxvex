@@ -3,6 +3,7 @@ import { generate, isLocked, isSolved, mismatchedEdges, move, restore, sameSlot,
 import type { Area, Difficulty, Puzzle, Side, Size, Slot } from './puzzle';
 import { TileRenderer } from './renderer';
 import type { TilePosition } from './renderer';
+import { setupSoundtrack } from './soundtrack';
 
 const arena = document.querySelector<HTMLDivElement>('#arena')!;
 const layer = document.querySelector<HTMLDivElement>('#render-layer')!;
@@ -50,6 +51,7 @@ const grids = {
 };
 
 const saveKey = 'tetrahex.alpha.puzzle.v2';
+const mobileGuideKey = 'foxvex.mobile-guide.v1';
 const layoutKey = 'tetrahex.alpha.small-layout.v1';
 const boardLayoutKey = 'foxvex.board-layout.v1';
 const assistantKey = 'tetrahex.alpha.matching-assistant.v1';
@@ -93,6 +95,23 @@ function newPuzzle(size: Size, difficulty: Difficulty) {
 
 function savedPuzzle() {
   try { return restore(JSON.parse(read(saveKey) ?? 'null')); } catch { return null; }
+}
+
+function showMobileGuide() {
+  if (restored || read(mobileGuideKey) || read('tetrahex.alpha.puzzle.v1')) return;
+
+  const { userAgent, maxTouchPoints } = navigator;
+  const appleMobile = /iPhone|iPad|iPod/i.test(userAgent) ||
+    (/Macintosh/i.test(userAgent) && maxTouchPoints > 1);
+  if (!appleMobile && !/Android/i.test(userAgent)) return;
+
+  const appleStandalone = (navigator as Navigator & { standalone?: boolean }).standalone;
+  if (appleStandalone || matchMedia('(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)').matches) return;
+
+  const instructions = appleMobile ? '#mobile-guide-apple' : '#mobile-guide-android';
+  document.querySelector<HTMLOListElement>(instructions)!.hidden = false;
+  document.querySelector<HTMLDialogElement>('#mobile-guide')!.showModal();
+  write(mobileGuideKey, 'shown');
 }
 
 type TilePress = {
@@ -147,6 +166,7 @@ const scene = new TileRenderer(() => {
   ready = true;
   resize();
   window.dispatchEvent(new Event('foxvex-ready'));
+  showMobileGuide();
 });
 new Phaser.Game({
   type: Phaser.CANVAS,
@@ -755,6 +775,7 @@ boardLayout.addEventListener('change', () => {
   scheduleLayout();
 });
 updateHowToPlay();
+setupSoundtrack(read, write);
 render();
 if (puzzle !== restored) save();
 announce(restored ? (isSolved(puzzle) ? 'Completed puzzle restored.' : 'Puzzle resumed.') : 'Pick any tile to begin.');
