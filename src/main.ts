@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { generate, isSolved, mismatchedEdges, move, restore, sameSlot, sizes, solution, unmatchedSides } from './puzzle';
+import { generate, isLocked, isSolved, mismatchedEdges, move, restore, sameSlot, sizes, solution, toggleMark, unmatchedSides, withoutLocks } from './puzzle';
 import type { Area, Difficulty, Puzzle, Side, Size, Slot } from './puzzle';
 import { TileRenderer } from './renderer';
 import type { TilePosition } from './renderer';
@@ -8,11 +8,15 @@ const arena = document.querySelector<HTMLDivElement>('#arena')!;
 const layer = document.querySelector<HTMLDivElement>('#render-layer')!;
 const boardSize = document.querySelector<HTMLSelectElement>('#size')!;
 const difficultySelect = document.querySelector<HTMLSelectElement>('#difficulty')!;
+const doubleTapAction = document.querySelector<HTMLSelectElement>('#double-tap-action')!;
 const puzzleDetails = document.querySelector<HTMLSpanElement>('#puzzle-details')!;
 const assistantMode = document.querySelector<HTMLSpanElement>('#assistant-mode')!;
 const undoButton = document.querySelector<HTMLButtonElement>('#undo')!;
 const checkButton = document.querySelector<HTMLButtonElement>('#check')!;
 const solveButton = document.querySelector<HTMLButtonElement>('#solve')!;
+const victory = document.querySelector<HTMLElement>('#victory')!;
+const victoryMoves = document.querySelector<HTMLParagraphElement>('#victory-moves')!;
+const nextPuzzle = document.querySelector<HTMLButtonElement>('#next-puzzle')!;
 const status = document.querySelector<HTMLParagraphElement>('#status')!;
 const progress = document.querySelector<HTMLSpanElement>('#progress')!;
 const remaining = document.querySelector<HTMLSpanElement>('#remaining')!;
@@ -26,10 +30,11 @@ const smallLayout = document.querySelector<HTMLSelectElement>('#small-layout')!;
 const matchingAssistant = document.querySelector<HTMLSelectElement>('#matching-assistant')!;
 const placementHelp = document.querySelector<HTMLParagraphElement>('#placement-help')!;
 const cheatMode = document.querySelector<HTMLInputElement>('#cheat-mode')!;
+const playMarking = document.querySelector<HTMLParagraphElement>('#play-marking')!;
+const playCheat = document.querySelector<HTMLParagraphElement>('#play-cheat')!;
+const playAssistant = document.querySelector<HTMLParagraphElement>('#play-assistant')!;
 const edgeTileLegend = document.querySelector<HTMLParagraphElement>('#edge-tile-legend')!;
-const rotateNote = document.querySelector<HTMLDivElement>('#rotate-note')!;
 const stackedLayout = matchMedia('(max-width: 699px) and (orientation: portrait)');
-const smallPortrait = matchMedia('(orientation: portrait) and ((max-width: 349px) or (max-height: 619px))');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const areas = ['board', 'tray'] as const;
 const grids = {
@@ -41,6 +46,7 @@ const saveKey = 'tetrahex.alpha.puzzle.v1';
 const layoutKey = 'tetrahex.alpha.small-layout.v1';
 const assistantKey = 'tetrahex.alpha.matching-assistant.v1';
 const cheatModeKey = 'tetrahex.alpha.cheat-mode.v1';
+const doubleTapKey = 'foxvex.double-tap-action.v1';
 const legacyMismatchKey = 'tetrahex.alpha.allow-mismatches.v1';
 const assistantDescriptions = {
   prevent: 'Rejects moves that would create a mismatch.',
@@ -48,6 +54,22 @@ const assistantDescriptions = {
   off: 'Allows mismatches and leaves tiles unmarked. Use Check to review the board.',
 };
 type AssistantMode = keyof typeof assistantDescriptions;
+const assistantInstructions: Record<AssistantMode, string> = {
+  prevent: 'Matching Assistant rejects moves that would create a mismatch.',
+  highlight: 'Matching Assistant outlines both tiles in red when their touching numbers differ.',
+  off: 'Use Check to see whether any touching numbers differ.',
+};
+
+function updateHowToPlay() {
+  const action = doubleTapAction.value;
+  const instruction = action === 'lock'
+    ? 'lock it in place or unlock it'
+    : 'mark it as tentative or remove the mark';
+  playMarking.hidden = action === 'disabled';
+  playMarking.textContent = `Double-tap or double-click a placed tile to ${instruction}. With a keyboard, focus the tile and press M.`;
+  playCheat.hidden = !cheatMode.checked;
+  playAssistant.textContent = assistantInstructions[matchingAssistant.value as AssistantMode];
+}
 
 function read(key: string) {
   try { return localStorage.getItem(key); } catch { return null; }
@@ -65,8 +87,17 @@ function savedPuzzle() {
   try { return restore(JSON.parse(read(saveKey) ?? 'null')); } catch { return null; }
 }
 
-type Drag = {
+type TilePress = {
   pointerId: number;
+  pointerType: string;
+  started: number;
+  x: number;
+  y: number;
+  from: Slot;
+  id: number;
+};
+
+type Drag = {
   touch: boolean;
   x: number;
   y: number;
@@ -87,11 +118,17 @@ type ReturnAnimation = {
 
 const restored = savedPuzzle();
 let puzzle = restored ?? newPuzzle(4, 'normal');
+const savedDoubleTapAction = read(doubleTapKey);
+doubleTapAction.value = savedDoubleTapAction === 'disabled' || savedDoubleTapAction === 'pencil'
+  ? savedDoubleTapAction : 'lock';
+if (doubleTapAction.value !== 'lock') puzzle = withoutLocks(puzzle);
 let conflictedSlots = new Set<number>();
 const edgeHintsByTile = new Map<number, Side[]>();
 const history: Puzzle[] = [];
 let cells: Record<Area, HTMLButtonElement[]> = { board: [], tray: [] };
 let selected: Slot | null = null;
+let press: TilePress | null = null;
+let lastTap: { slot: Slot; id: number; pointerType: string; time: number } | null = null;
 let drag: Drag | null = null;
 let returning: ReturnAnimation | null = null;
 let animationFrame = 0;
@@ -121,8 +158,8 @@ function announce(message: string, tone = '') {
 }
 
 function save() {
-  const { size, seed, difficulty, board, tray, moves, revealed } = puzzle;
-  write(saveKey, JSON.stringify({ size, seed, difficulty, board, tray, moves, revealed }));
+  const { size, seed, difficulty, board, tray, moves, revealed, marks } = puzzle;
+  write(saveKey, JSON.stringify({ size, seed, difficulty, board, tray, moves, revealed, marks }));
 }
 
 function cellAt(slot: Slot) {
@@ -142,16 +179,13 @@ function tileDecoration(slot: Slot, id: number) {
   return {
     outlineColor: showMismatch(slot) ? 0xf13447 : undefined,
     edgeHints: edgeHintsByTile.get(id),
+    mark: puzzle.marks[id],
   };
 }
 
 function draw(time: number) {
   animationFrame = 0;
   if (!ready) return;
-  if (arena.hidden) {
-    scene.hideAll();
-    return;
-  }
 
   scrollWithDrag();
   scene.showTiles(puzzle.tiles);
@@ -163,7 +197,9 @@ function draw(time: number) {
       }
     });
   }
-  if (drag) scene.place(drag.id, drag.position, { raised: true, edgeHints: edgeHintsByTile.get(drag.id) });
+  if (drag) scene.place(drag.id, drag.position, {
+    raised: true, edgeHints: edgeHintsByTile.get(drag.id), mark: puzzle.marks[drag.id],
+  });
   if (returning) {
     const end = positionOf(returning.to);
     const progress = Math.min(1, Math.max(0, (time - returning.started) / 155));
@@ -174,7 +210,7 @@ function draw(time: number) {
       y: y + (end.y - y) * eased,
       size: size + (end.size - size) * eased,
     }, progress === 1 ? tileDecoration(returning.to, returning.id) : {
-      raised: true, edgeHints: edgeHintsByTile.get(returning.id),
+      raised: true, edgeHints: edgeHintsByTile.get(returning.id), mark: puzzle.marks[returning.id],
     });
     if (progress === 1) returning = null;
     else scheduleDraw();
@@ -191,23 +227,21 @@ function puzzleDescription(size: Size, difficulty?: Difficulty) {
 }
 
 function resize() {
-  if (!arena.hidden) {
-    const rect = arena.getBoundingClientRect();
-    const boardHeight = grids.board.getBoundingClientRect().height;
-    const trayHeight = grids.tray.getBoundingClientRect().height;
-    const stacked = stackedLayout.matches;
-    const gridHeight = stacked ? boardHeight + trayHeight : Math.max(boardHeight, trayHeight);
-    const panelSpace = rect.height - gridHeight;
-    const pageTop = rect.top + window.scrollY;
-    const bottomPadding = parseFloat(getComputedStyle(arena.parentElement!).paddingBottom);
-    const visual = window.visualViewport;
-    const viewportHeight = visual?.scale === 1 ? Math.min(innerHeight, visual.height) : innerHeight;
-    const available = Math.floor((viewportHeight - pageTop - panelSpace - bottomPadding) / (stacked ? 2 : 1));
-    const minimumTile = smallLayout.value === 'fit' ? 26 : stacked ? 39 : 35;
-    const minimumGrid = puzzle.size * minimumTile + (puzzle.size - 1) * 6;
-    const gridSize = Math.min(430, Math.max(available, minimumGrid));
-    arena.style.setProperty('--grid-max', `${gridSize}px`);
-  }
+  const rect = arena.getBoundingClientRect();
+  const boardHeight = grids.board.getBoundingClientRect().height;
+  const trayHeight = grids.tray.getBoundingClientRect().height;
+  const stacked = stackedLayout.matches;
+  const gridHeight = stacked ? boardHeight + trayHeight : Math.max(boardHeight, trayHeight);
+  const panelSpace = rect.height - gridHeight;
+  const pageTop = rect.top + window.scrollY;
+  const bottomPadding = parseFloat(getComputedStyle(arena.parentElement!).paddingBottom);
+  const visual = window.visualViewport;
+  const viewportHeight = visual?.scale === 1 ? Math.min(innerHeight, visual.height) : innerHeight;
+  const available = Math.floor((viewportHeight - pageTop - panelSpace - bottomPadding) / (stacked ? 2 : 1));
+  const minimumTile = smallLayout.value === 'fit' ? 26 : stacked ? 39 : 35;
+  const minimumGrid = puzzle.size * minimumTile + (puzzle.size - 1) * 6;
+  const gridSize = Math.min(430, Math.max(available, minimumGrid));
+  arena.style.setProperty('--grid-max', `${gridSize}px`);
   if (ready) scene.resize(layer.clientWidth, layer.clientHeight);
   scheduleDraw();
 }
@@ -252,6 +286,8 @@ function render() {
     puzzle[area].forEach((id, index) => {
       const cell = cellAt({ area, index });
       cell.classList.toggle('occupied', id !== null);
+      const mark = id === null ? undefined : puzzle.marks[id];
+      cell.classList.toggle('locked', mark === 'lock');
       cell.classList.toggle('selected', !!selected && sameSlot(selected, { area, index }));
       const where = `Row ${Math.floor(index / puzzle.size) + 1}, column ${index % puzzle.size + 1}`;
       if (id === null) cell.setAttribute('aria-label', `${where}, empty`);
@@ -260,7 +296,8 @@ function render() {
         const sides = edgeHintsByTile.get(id);
         const hint = sides ? `, edge tile, unmatched ${sides.join(', ')}` : '';
         const conflict = showMismatch({ area, index }) ? ', mismatched edge' : '';
-        cell.setAttribute('aria-label', `${where}, tile, top ${north}, right ${east}, bottom ${south}, left ${west}${hint}${conflict}`);
+        const marking = mark === 'lock' ? ', locked' : mark === 'pencil' ? ', tentative' : '';
+        cell.setAttribute('aria-label', `${where}, tile, top ${north}, right ${east}, bottom ${south}, left ${west}${hint}${conflict}${marking}`);
       }
     });
   }
@@ -268,22 +305,30 @@ function render() {
   assistantMode.textContent = matchingAssistant.value;
   undoButton.disabled = history.length === 0;
   const solved = isSolved(puzzle);
+  checkButton.hidden = matchingAssistant.value !== 'off';
   checkButton.disabled = solved;
   solveButton.disabled = solved;
+  victory.hidden = !solved || puzzle.revealed;
   progress.textContent = `${placed} / ${total} placed`;
   remaining.textContent = `${total - placed} remaining`;
   moveCount.textContent = `${puzzle.moves} ${puzzle.moves === 1 ? 'move' : 'moves'}`;
+  if (!victory.hidden) victoryMoves.textContent = moveCount.textContent;
   scheduleLayout();
 }
 
 function commit(next: Puzzle, message: string) {
+  const marking = next.board === puzzle.board;
+  const wasShowingVictory = !victory.hidden;
   history.push(puzzle);
   puzzle = next;
+  lastTap = null;
   selected = null;
   returning = null;
   save();
   render();
-  if (isSolved(puzzle) && !puzzle.revealed) announce('Puzzle solved!', 'success');
+  if (!wasShowingVictory && !victory.hidden) nextPuzzle.focus({ preventScroll: true });
+  if (marking) announce(message);
+  else if (isSolved(puzzle) && !puzzle.revealed) announce('Puzzle solved!', 'success');
   else if (matchingAssistant.value === 'highlight' && conflictedSlots.size) {
     announce(`${message} Check the red outlines.`, 'error');
   }
@@ -308,24 +353,18 @@ function scrollWithDrag() {
 }
 
 function endDrag(animate = false) {
-  if (!drag) return;
   const previous = drag;
+  const pointerId = press?.pointerId;
   clearTarget();
   drag = null;
-  if (arena.hasPointerCapture(previous.pointerId)) arena.releasePointerCapture(previous.pointerId);
+  press = null;
+  if (pointerId !== undefined && arena.hasPointerCapture(pointerId)) arena.releasePointerCapture(pointerId);
+  if (!previous) return;
   document.body.classList.remove('dragging');
   if (animate && !reducedMotion.matches) {
     returning = { id: previous.id, from: previous.position, to: previous.from, started: performance.now() };
   }
   scheduleDraw();
-}
-
-function updateSmallLayout() {
-  const landscapeRequested = smallPortrait.matches && smallLayout.value === 'landscape';
-  if (landscapeRequested) endDrag();
-  arena.hidden = landscapeRequested;
-  rotateNote.hidden = !landscapeRequested;
-  scheduleLayout();
 }
 
 function confirmAction(title: string, message: string, label: string, action: () => void) {
@@ -341,6 +380,7 @@ function confirmAction(title: string, message: string, label: string, action: ()
 
 function replacePuzzle(size: Size, difficulty: Difficulty) {
   endDrag();
+  lastTap = null;
   returning = null;
   selected = null;
   history.length = 0;
@@ -374,34 +414,57 @@ function markFocus(slot: Slot) {
   cellAt(slot).tabIndex = 0;
 }
 
+function markTile(slot: Slot) {
+  const action = doubleTapAction.value;
+  if (action !== 'lock' && action !== 'pencil') return;
+  const next = toggleMark(puzzle, slot, action);
+  if (!next) return;
+  const id = next.board[slot.index]!;
+  const message = action === 'lock'
+    ? next.marks[id] ? 'Tile locked.' : 'Tile unlocked.'
+    : next.marks[id] ? 'Tile penciled in.' : 'Pencil mark removed.';
+  commit(next, message);
+}
+
+const unlockMessage = 'Tile locked. Double-tap to unlock, or press M.';
+const dragThreshold = 7;
+const doubleTapDelay = 360;
+
 arena.addEventListener('pointerdown', event => {
-  if (drag || !event.isPrimary || event.button !== 0) return;
+  if (press || !event.isPrimary || event.button !== 0) return;
   const from = slotFor(event.target);
+  if (!from || from.area !== 'board') lastTap = null;
   if (!from) return;
   const id = puzzle[from.area][from.index];
-  if (id === null) return;
+  if (id === null) {
+    lastTap = null;
+    return;
+  }
 
   event.preventDefault();
   markFocus(from);
   selected = null;
+  press = {
+    pointerId: event.pointerId, pointerType: event.pointerType, started: performance.now(),
+    from, id, x: event.clientX, y: event.clientY,
+  };
+  arena.setPointerCapture(event.pointerId);
+  render();
+});
+
+function beginDrag(start: TilePress) {
   returning = null;
-  const position = positionOf(from);
+  const position = positionOf(start.from);
+  const touch = start.pointerType === 'touch';
   drag = {
-    pointerId: event.pointerId,
-    touch: event.pointerType === 'touch',
-    x: event.clientX,
-    y: event.clientY,
-    from,
-    id,
-    offsetX: event.clientX - position.x,
-    offsetY: event.clientY - position.y + (event.pointerType === 'touch' ? position.size * .42 : 0),
+    touch, from: start.from, id: start.id, x: start.x, y: start.y,
+    offsetX: start.x - position.x,
+    offsetY: start.y - position.y + (touch ? position.size * .42 : 0),
     position,
     target: null,
   };
-  arena.setPointerCapture(event.pointerId);
   document.body.classList.add('dragging');
-  render();
-});
+}
 
 function targetAt(x: number, y: number) {
   const hit = slotFor(document.elementFromPoint(x, y));
@@ -415,13 +478,24 @@ function highlightTarget() {
   clearTarget();
   drag.target = target;
   if (target) {
-    const valid = matchingAssistant.value === 'off' || move(puzzle, drag.from, target, false) !== null;
+    const valid = move(puzzle, drag.from, target, matchingAssistant.value === 'off') !== null;
     cellAt(target).classList.add(valid ? 'target' : 'invalid');
   }
 }
 
 arena.addEventListener('pointermove', event => {
-  if (drag?.pointerId !== event.pointerId) return;
+  if (press?.pointerId !== event.pointerId) return;
+  if (!drag) {
+    if (Math.hypot(event.clientX - press.x, event.clientY - press.y) < dragThreshold) return;
+    lastTap = null;
+    if (isLocked(puzzle, press.from)) {
+      endDrag();
+      announce(unlockMessage, 'error');
+      return;
+    }
+    beginDrag(press);
+  }
+  if (!drag) return;
   drag.x = event.clientX;
   drag.y = event.clientY;
   drag.position.x = drag.x - drag.offsetX;
@@ -431,21 +505,48 @@ arena.addEventListener('pointermove', event => {
 });
 
 arena.addEventListener('pointerup', event => {
-  if (drag?.pointerId !== event.pointerId) return;
+  if (press?.pointerId !== event.pointerId) return;
+  if (!drag) {
+    const { from, id, started, pointerType, x, y } = press;
+    endDrag();
+    const now = performance.now();
+    const release = slotFor(document.elementFromPoint(event.clientX, event.clientY));
+    if (from.area !== 'board' || doubleTapAction.value === 'disabled' ||
+        !release || !sameSlot(from, release) || now - started > doubleTapDelay ||
+        Math.hypot(event.clientX - x, event.clientY - y) >= dragThreshold) {
+      lastTap = null;
+      return;
+    }
+    if (lastTap?.id === id && lastTap.pointerType === pointerType &&
+        sameSlot(lastTap.slot, from) && now - lastTap.time <= doubleTapDelay) {
+      lastTap = null;
+      markTile(from);
+    } else {
+      lastTap = { slot: from, id, pointerType, time: now };
+    }
+    return;
+  }
   const to = targetAt(event.clientX, event.clientY);
+  const locked = to && isLocked(puzzle, to);
   const next = to && move(puzzle, drag.from, to, matchingAssistant.value !== 'prevent');
   const swapped = to && puzzle[to.area][to.index] !== null;
   endDrag(!next);
   if (next) commit(next, swapped ? 'Tiles swapped.' : 'Tile moved.');
+  else if (locked) announce(unlockMessage, 'error');
   else if (to) announce('Those edges don’t match. Tile returned.', 'error');
 });
 
 function cancelPointer(event: PointerEvent) {
-  if (drag?.pointerId === event.pointerId) endDrag(true);
+  if (press?.pointerId !== event.pointerId) return;
+  lastTap = null;
+  endDrag(true);
 }
 arena.addEventListener('pointercancel', cancelPointer);
 arena.addEventListener('lostpointercapture', cancelPointer);
-window.addEventListener('blur', () => endDrag());
+window.addEventListener('blur', () => {
+  lastTap = null;
+  endDrag();
+});
 window.addEventListener('resize', scheduleLayout);
 window.visualViewport?.addEventListener('resize', scheduleLayout);
 window.addEventListener('scroll', () => {
@@ -457,10 +558,14 @@ layoutObserver.observe(arena);
 layoutObserver.observe(document.querySelector('.toolbar')!);
 
 arena.addEventListener('click', event => {
-  if (event.detail !== 0 || drag) return;
+  if (event.detail !== 0 || press) return;
   const to = slotFor(event.target);
   if (!to) return;
   const occupant = puzzle[to.area][to.index];
+  if (isLocked(puzzle, to)) {
+    announce(unlockMessage, 'error');
+    return;
+  }
   if (!selected) {
     if (occupant === null) return;
     selected = to;
@@ -478,7 +583,12 @@ arena.addEventListener('click', event => {
 
 arena.addEventListener('keydown', event => {
   const slot = slotFor(event.target);
-  if (!slot || drag) return;
+  if (!slot || press) return;
+  if (event.key.toLowerCase() === 'm' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    event.preventDefault();
+    if (!event.repeat) markTile(slot);
+    return;
+  }
   if (event.key === 'Escape' && selected) {
     selected = null;
     render();
@@ -501,6 +611,10 @@ arena.addEventListener('keydown', event => {
 });
 
 document.querySelector('#new')!.addEventListener('click', startPuzzle);
+nextPuzzle.addEventListener('click', () => {
+  startPuzzle();
+  cellAt({ area: 'tray', index: 0 }).focus({ preventScroll: true });
+});
 function announceNextPuzzle() {
   const size = Number(boardSize.value) as Size;
   const difficulty = difficultySelect.value as Difficulty;
@@ -514,6 +628,7 @@ undoButton.addEventListener('click', () => {
   if (!previous) return;
   endDrag();
   puzzle = previous;
+  lastTap = null;
   selected = null;
   returning = null;
   save();
@@ -523,10 +638,7 @@ undoButton.addEventListener('click', () => {
 
 checkButton.addEventListener('click', () => {
   const left = puzzle.tray.filter(id => id !== null).length;
-  if (conflictedSlots.size) {
-    const hint = matchingAssistant.value === 'highlight' ? ' Check the red outlines.' : '';
-    announce(`Some touching numbers differ.${hint}`, 'error');
-  }
+  if (conflictedSlots.size) announce('Some touching numbers differ.', 'error');
   else announce(`Edges match so far. ${left} ${left === 1 ? 'tile' : 'tiles'} left to place.`);
 });
 
@@ -547,24 +659,35 @@ matchingAssistant.addEventListener('change', () => {
   const mode = matchingAssistant.value as AssistantMode;
   write(assistantKey, mode);
   placementHelp.textContent = assistantDescriptions[mode];
+  updateHowToPlay();
   render();
   announce(placementHelp.textContent);
 });
 boardSize.value = String(puzzle.size);
 difficultySelect.value = puzzle.difficulty ?? 'normal';
+doubleTapAction.addEventListener('change', () => {
+  lastTap = null;
+  write(doubleTapKey, doubleTapAction.value);
+  updateHowToPlay();
+  if (doubleTapAction.value !== 'lock') {
+    puzzle = withoutLocks(puzzle);
+    for (let index = 0; index < history.length; index++) history[index] = withoutLocks(history[index]);
+    save();
+    render();
+  }
+});
 cheatMode.checked = read(cheatModeKey) === 'true';
 cheatMode.addEventListener('change', () => {
   write(cheatModeKey, String(cheatMode.checked));
+  updateHowToPlay();
   render();
 });
-const savedLayout = read(layoutKey);
-smallLayout.value = savedLayout === 'landscape' || savedLayout === 'fit' ? savedLayout : 'scroll';
+smallLayout.value = read(layoutKey) === 'fit' ? 'fit' : 'scroll';
 smallLayout.addEventListener('change', () => {
   write(layoutKey, smallLayout.value);
-  updateSmallLayout();
+  scheduleLayout();
 });
-smallPortrait.addEventListener('change', updateSmallLayout);
-updateSmallLayout();
+updateHowToPlay();
 render();
-if (!restored) save();
+if (puzzle !== restored) save();
 announce(restored ? (isSolved(puzzle) ? 'Completed puzzle restored.' : 'Puzzle resumed.') : 'Pick any tile to begin.');

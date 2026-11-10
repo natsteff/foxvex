@@ -6,6 +6,7 @@ export type Area = 'board' | 'tray';
 export type Slot = { area: Area; index: number };
 export type Tile = { north: number; east: number; south: number; west: number };
 type Slots = Record<Area, (number | null)[]>;
+export type TileMark = 'pencil' | 'lock';
 
 export type Puzzle = Slots & {
   size: Size;
@@ -14,6 +15,7 @@ export type Puzzle = Slots & {
   tiles: Tile[];
   moves: number;
   revealed: boolean;
+  marks: Partial<Record<number, TileMark>>;
 };
 
 export type Side = keyof Tile;
@@ -96,7 +98,7 @@ export function generate(size: Size, seed: number, difficulty?: Difficulty): Puz
   const tray = shuffle(tiles.map((_, id) => id), random);
   if (difficulty) setBorderClues(tiles, size, difficulty, random);
 
-  return { size, seed, difficulty, tiles, board: tiles.map(() => null), tray, moves: 0, revealed: false };
+  return { size, seed, difficulty, tiles, board: tiles.map(() => null), tray, moves: 0, revealed: false, marks: {} };
 }
 
 export function mismatchedEdges(puzzle: Puzzle): [number, number][] {
@@ -120,14 +122,40 @@ export function sameSlot(first: Slot, second: Slot): boolean {
   return first.area === second.area && first.index === second.index;
 }
 
+export function isLocked(puzzle: Puzzle, slot: Slot) {
+  const id = puzzle[slot.area][slot.index];
+  return slot.area === 'board' && id != null && puzzle.marks[id] === 'lock';
+}
+
+export function withoutLocks(puzzle: Puzzle): Puzzle {
+  if (!Object.values(puzzle.marks).includes('lock')) return puzzle;
+  const marks = Object.fromEntries(Object.entries(puzzle.marks).filter(([, mark]) => mark === 'pencil'));
+  return { ...puzzle, marks };
+}
+
+export function toggleMark(puzzle: Puzzle, slot: Slot, mark: TileMark): Puzzle | null {
+  const id = puzzle.board[slot.index];
+  if (slot.area !== 'board' || id == null) return null;
+  const marks = { ...puzzle.marks };
+  if (marks[id] === mark) delete marks[id];
+  else marks[id] = mark;
+  return { ...puzzle, marks };
+}
+
 export function move(puzzle: Puzzle, from: Slot, to: Slot, allowMismatches: boolean): Puzzle | null {
   const tile = puzzle[from.area][from.index];
   const target = puzzle[to.area][to.index];
-  if (tile == null || target === undefined || sameSlot(from, to)) return null;
+  if (tile == null || target === undefined || sameSlot(from, to) ||
+      isLocked(puzzle, from) || isLocked(puzzle, to)) return null;
 
   const next = { ...puzzle, board: [...puzzle.board], tray: [...puzzle.tray], moves: puzzle.moves + 1 };
   next[from.area][from.index] = target;
   next[to.area][to.index] = tile;
+  const returned = to.area === 'tray' ? tile : from.area === 'tray' ? target : null;
+  if (returned != null && next.marks[returned]) {
+    next.marks = { ...next.marks };
+    delete next.marks[returned];
+  }
   if (allowMismatches) return next;
 
   // Existing mismatches may still be on the board after switching to strict play.
@@ -143,6 +171,7 @@ export function solution(puzzle: Puzzle): Puzzle {
     board: puzzle.tiles.map((_, id) => id),
     tray: puzzle.tiles.map(() => null),
     revealed: true,
+    marks: {},
   };
 }
 
@@ -161,5 +190,13 @@ export function restore(value: unknown): Puzzle | null {
   if (ids.length !== count || new Set(ids).size !== count ||
       ids.some(id => !Number.isInteger(id) || id < 0 || id >= count)) return null;
 
-  return { ...generate(size, seed, difficulty), board, tray, moves, revealed };
+  const marks: Puzzle['marks'] = {};
+  if (data.marks && typeof data.marks === 'object' && !Array.isArray(data.marks)) {
+    for (const id of board) {
+      if (id === null) continue;
+      const mark = data.marks[id];
+      if (mark === 'pencil' || mark === 'lock') marks[id] = mark;
+    }
+  }
+  return { ...generate(size, seed, difficulty), board, tray, moves, revealed, marks };
 }

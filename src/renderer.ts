@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { Side, Tile } from './puzzle';
+import type { Side, Tile, TileMark } from './puzzle';
 
 const palette = [
   0xffd480, 0x8fd9e4, 0xb9df93, 0xf6a8be, 0xc2b1f6,
@@ -14,7 +14,33 @@ type TileView = {
   size: number;
   outlineColor?: number;
   edgeHints?: readonly Side[];
+  mark?: TileMark;
 };
+
+function drawTileMark(face: Phaser.GameObjects.Graphics, size: number, mark: TileMark) {
+  const center = size / 2;
+  const diameter = Math.min(size * .44, Phaser.Math.Clamp(size * .28, 20, 30));
+  face.fillStyle(0x111827, .85).fillCircle(center, center, diameter / 2);
+  face.lineStyle(Math.max(1, diameter * .065), 0xffffff);
+  if (mark === 'pencil') {
+    const curveY = center - diameter * .11;
+    const curveRadius = diameter * .14;
+    face.beginPath();
+    face.arc(center, curveY, curveRadius, Math.PI, 2.5 * Math.PI);
+    face.lineTo(center, center + diameter * .10);
+    face.strokePath();
+    face.fillStyle(0xffffff).fillCircle(center, center + diameter * .23, diameter * .04);
+    return;
+  }
+  const shackleRadius = diameter * .15;
+  const shackleY = center - diameter * .09;
+  face.beginPath();
+  face.arc(center, shackleY, shackleRadius, Math.PI, 2 * Math.PI);
+  face.strokePath();
+  face.fillStyle(0xffffff).fillRoundedRect(
+    center - diameter * .24, shackleY, diameter * .48, diameter * .32, diameter * .05,
+  );
+}
 
 function drawEdgeHint(face: Phaser.GameObjects.Graphics, size: number, sides: readonly Side[]) {
   const cyan = 0x00f6ff;
@@ -87,17 +113,20 @@ export class TileRenderer extends Phaser.Scene {
     });
   }
 
-  place(id: number, { x, y, size }: TilePosition, { raised = false, outlineColor, edgeHints }: {
+  place(id: number, { x, y, size }: TilePosition, { raised = false, outlineColor, edgeHints, mark }: {
     raised?: boolean;
     outlineColor?: number;
     edgeHints?: readonly Side[];
+    mark?: TileMark;
   } = {}) {
     const view = this.views[id];
     view.root.setPosition(x, y).setDepth(raised ? 2 : 0).setVisible(size > 0);
-    if (size <= 0 || (view.size === size && view.outlineColor === outlineColor && view.edgeHints === edgeHints)) return;
+    if (size <= 0 || (view.size === size && view.outlineColor === outlineColor &&
+        view.edgeHints === edgeHints && view.mark === mark)) return;
     view.size = size;
     view.outlineColor = outlineColor;
     view.edgeHints = edgeHints;
+    view.mark = mark;
 
     const { face, labels } = view;
     const { north, east, south, west } = this.tiles[id];
@@ -107,6 +136,7 @@ export class TileRenderer extends Phaser.Scene {
     face.fillStyle(palette[east - 1]).fillTriangle(size, 0, size, size, middle, middle);
     face.fillStyle(palette[south - 1]).fillTriangle(size, size, 0, size, middle, middle);
     face.fillStyle(palette[west - 1]).fillTriangle(0, size, 0, 0, middle, middle);
+    if (mark === 'pencil') face.fillStyle(0xc4cbd4, .42).fillRect(0, 0, size, size);
     face.lineStyle(1, 0x131826, .33)
       .lineBetween(0, 0, size, size).lineBetween(size, 0, 0, size);
     if (edgeHints) drawEdgeHint(face, size, edgeHints);
@@ -114,15 +144,12 @@ export class TileRenderer extends Phaser.Scene {
       const inset = edgeHints ? 4.5 : 1.5;
       face.lineStyle(3, outlineColor).strokeRect(inset, inset, size - 2 * inset, size - 2 * inset);
     }
+    if (mark) drawTileMark(face, size, mark);
     const positions = [[.5, .215], [.785, .5], [.5, .785], [.215, .5]];
     labels.forEach((label, index) => {
       const [labelX, labelY] = positions[index];
       label.setPosition(labelX * size, labelY * size)
         .setFontSize(Math.min(28, Math.max(11, Math.floor(size * .23))));
     });
-  }
-
-  hideAll() {
-    this.views.forEach(view => view.root.setVisible(false));
   }
 }

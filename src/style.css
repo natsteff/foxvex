@@ -69,6 +69,26 @@ main { padding-block: 10px 8px; }
 #progress { white-space: nowrap; }
 .count { color: var(--muted); font-size: .75rem; font-variant-numeric: tabular-nums; }
 #edge-tile-legend { color: #69eaf0; font-size: .75rem; margin: 6px auto 0; width: min(100%, var(--grid-max)); }
+.tray-content { position: relative; }
+.victory-overlay { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; pointer-events: none; }
+.victory-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: min(100%, 190px);
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: #222d42;
+  box-shadow: 0 5px 18px #0b1020b3;
+  text-align: center;
+}
+.victory-trophy { width: 23px; height: 23px; color: var(--accent); }
+.victory-card h3, .victory-card p { margin: 0; }
+.victory-card h3 { font-size: 1rem; }
+.victory-card p { color: var(--muted); font-size: .8rem; }
+.victory-card button { pointer-events: auto; min-height: 36px; }
+.dragging .victory-card button { pointer-events: none; }
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--size, 4), minmax(0, 1fr));
@@ -89,6 +109,7 @@ main { padding-block: 10px 8px; }
   -webkit-touch-callout: none;
 }
 .cell.occupied { touch-action: none; cursor: grab; }
+.cell.locked { cursor: default; }
 .cell.target { background: #344762; outline: 2px solid #a4dfea; outline-offset: -2px; }
 .cell.invalid { background: #4b283b; outline: 2px solid #f9a3b7; outline-offset: -2px; }
 .cell.selected { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -103,7 +124,6 @@ body.dragging, body.dragging .cell { cursor: grabbing; }
 #status[data-tone="success"] { color: #a6e9c7; }
 #status[data-tone="error"] { color: #ffbac8; }
 .move-count { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.rotate-note { color: var(--accent); font-size: .85rem; margin-bottom: 8px; }
 
 dialog {
   width: min(100% - 30px, 400px);
@@ -115,6 +135,7 @@ dialog {
 }
 dialog::backdrop { background: #070b15bd; }
 dialog h2 { margin: 0 0 14px; }
+#settings-heading:focus { outline: none; }
 dialog label { display: block; margin-bottom: 8px; }
 .setting-group + .setting-group { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
 .setting-group p { margin: 6px 0 0; }
@@ -149,6 +170,11 @@ dialog form { display: flex; justify-content: flex-end; gap: 8px; }
 
 @media (max-width: 699px) and (orientation: portrait) {
   .arena { grid-template-columns: 1fr; }
+}
+
+@media (orientation: landscape) {
+  .tray-panel { grid-column: 1; grid-row: 1; }
+  .board-panel { grid-column: 2; grid-row: 1; }
 }
 
 @media (max-width: 699px) and (max-height: 620px) and (orientation: portrait) {

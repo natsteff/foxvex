@@ -61,7 +61,7 @@
       <div class="play-controls">
         <div class="toolbar-group">
           <button id="undo" type="button" disabled>Undo</button>
-          <button id="check" type="button">Check</button>
+          <button id="check" type="button" hidden>Check</button>
           <button id="solve" type="button">Solve</button>
         </div>
         <div class="game-info">
@@ -70,9 +70,8 @@
         </div>
       </div>
     </div>
-    <div id="rotate-note" class="rotate-note" hidden>Rotate your phone to landscape, or choose Fit screen or Scroll in Settings.</div>
     <div id="arena" class="arena">
-      <section class="panel" aria-labelledby="board-label">
+      <section class="panel board-panel" aria-labelledby="board-label">
         <header class="panel-heading">
           <h2 id="board-label">
             Play area <span id="puzzle-details"></span>
@@ -82,19 +81,31 @@
         </header>
         <div id="board" class="grid" role="group" aria-label="Play area"></div>
       </section>
-      <section class="panel" aria-labelledby="tray-label">
+      <section class="panel tray-panel" aria-labelledby="tray-label">
         <header class="panel-heading">
           <h2 id="tray-label">Tile tray</h2>
           <span id="remaining" class="count"></span>
         </header>
-        <div id="tray" class="grid" role="group" aria-label="Tile tray"></div>
+        <div class="tray-content">
+          <div id="tray" class="grid" role="group" aria-label="Tile tray"></div>
+          <section id="victory" class="victory-overlay" aria-labelledby="victory-title" hidden>
+            <div class="victory-card">
+              <svg class="victory-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M7 4h10v6a5 5 0 0 1-10 0V4Zm0 2H3v2a4 4 0 0 0 4 4m10-6h4v2a4 4 0 0 1-4 4m-5 3v4m-4 2h8m-7-2h6" />
+              </svg>
+              <h3 id="victory-title">Puzzle solved!</h3>
+              <p id="victory-moves"></p>
+              <button id="next-puzzle" class="primary" type="button">Next Puzzle</button>
+            </div>
+          </section>
+        </div>
         <p id="edge-tile-legend" hidden>Edge Tile (Cheat Mode Enabled)</p>
       </section>
       <div id="render-layer" aria-hidden="true"></div>
     </div>
   </main>
   <dialog id="settings-dialog" aria-labelledby="settings-heading">
-    <h2 id="settings-heading">Settings</h2>
+    <h2 id="settings-heading" tabindex="-1" autofocus>Settings</h2>
     <div class="setting-group">
       <label for="matching-assistant">Matching Assistant</label>
       <select id="matching-assistant" aria-describedby="placement-help">
@@ -109,17 +120,28 @@
       <p id="cheat-help">Outlines tiles in cyan and marks the sides that must face out because they have no match.</p>
     </div>
     <div class="setting-group">
+      <label for="double-tap-action">Double-Tap Action</label>
+      <select id="double-tap-action" aria-describedby="double-tap-help">
+        <option value="disabled">Disabled</option>
+        <option value="pencil">Pencil In</option>
+        <option value="lock" selected>Lock In</option>
+      </select>
+      <p id="double-tap-help">On the board, double-tap, double-click, or press M on a focused tile to mark or unmark it. Locked tiles stay put until unlocked.</p>
+    </div>
+    <div class="setting-group">
       <label for="small-layout">Small-screen layout</label>
       <select id="small-layout" aria-describedby="layout-help">
-        <option value="scroll">Scroll to see the full puzzle</option>
+        <option value="scroll">Scroll with larger tiles</option>
         <option value="fit">Fit screen with smaller tiles</option>
-        <option value="landscape">Rotate to landscape</option>
       </select>
-      <p id="layout-help">Fit screen lets tiles shrink further. Scroll keeps tiles larger when space is tight. Rotate prompts for landscape on very small portrait screens.</p>
+      <p id="layout-help">Choose larger tiles with scrolling or let tiles shrink further to fit more of the puzzle on screen.</p>
     </div>
     <details class="setting-group">
       <summary>How to Play</summary>
       <p>Drag tiles onto the board so the numbers on touching sides match. Drop onto an occupied square to swap tiles.</p>
+      <p id="play-marking" hidden></p>
+      <p id="play-cheat" hidden>Cheat Mode outlines edge tiles in cyan. Each bright notch marks a side that must face the outside of the board. The hints stay with the tile when you move it.</p>
+      <p id="play-assistant"></p>
     </details>
     <div class="setting-group">
       <strong>FoxVex v<span id="game-version">__FOXVEX_VERSION__</span> · Alpha</strong>
