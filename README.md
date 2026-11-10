@@ -15,7 +15,9 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 - **Three difficulty levels** vary how many edges give away a tile’s position.
 - **Matching Assistant** can prevent mismatches, outline them in red, or leave them unmarked.
 - **Optional Cheat Mode** marks tiles that have an unmatched edge and must go on the border.
-- **Local saves** let you resume a puzzle in the same browser. You can also undo moves or reveal the solution.
+- **Lock In and Pencil In** let you double-tap a placed tile to lock it in place or flag a tentative placement with a question mark.
+- **Local saves** let you resume a puzzle in the same browser, including locked and penciled-in tiles. You can also undo moves or reveal the solution.
+- **Puzzle completion** shows your move count and a **Next Puzzle** button.
 
 FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. Landscape puts the tray on the left and the board on the right. Phone portrait stacks the board above the tray. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. Controller support and FOX Arcade validation are planned.
 
