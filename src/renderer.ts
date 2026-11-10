@@ -1,14 +1,54 @@
 import Phaser from 'phaser';
+import { sizes } from './puzzle';
 import type { Side, Tile, TileMark } from './puzzle';
 
 const palette = [
-  0xffd480, 0x8fd9e4, 0xb9df93, 0xf6a8be, 0xc2b1f6,
-  0xffb993, 0x9ec0ff, 0x8fdbc0, 0xf5a49b, 0xd5de91,
+  ['#293336', '#69777b', '#bfcbcd'],
+  ['#3e2309', '#c68a21', '#f6cf65'],
+  ['#072e38', '#087d83', '#46c6bd'],
+  ['#0b361e', '#16863d', '#69d67d'],
+  ['#41121c', '#ad3049', '#f37d89'],
+  ['#321547', '#8840b9', '#cd8cf0'],
+  ['#4c2316', '#b05a2d', '#f4a16c'],
+  ['#14294f', '#2f69b4', '#74b8fa'],
+  ['#400f32', '#a03479', '#e776b5'],
+  ['#222141', '#4d4b9e', '#9999e4'],
 ];
+const textureSize = 160;
+const atlasColumns = Math.max(...sizes);
+const corners = [[0, 0], [textureSize, 0], [textureSize, textureSize], [0, textureSize]] as const;
+
+function paintMetalTile(context: CanvasRenderingContext2D, x: number, y: number, digits: number[]) {
+  context.save();
+  context.translate(x, y);
+  context.fillStyle = '#111513';
+  context.fillRect(0, 0, textureSize, textureSize);
+  const middle = textureSize / 2;
+  digits.forEach((digit, index) => {
+    const [shadow, base, sheen] = palette[digit];
+    const gradient = context.createLinearGradient(0, textureSize, textureSize, 0);
+    gradient.addColorStop(0, shadow);
+    gradient.addColorStop(.36, base);
+    gradient.addColorStop(.48, sheen);
+    gradient.addColorStop(.54, base);
+    gradient.addColorStop(.76, shadow);
+    gradient.addColorStop(1, base);
+    const [startX, startY] = corners[index];
+    const [endX, endY] = corners[(index + 1) % corners.length];
+    context.fillStyle = gradient;
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(endX, endY);
+    context.lineTo(middle, middle);
+    context.fill();
+  });
+  context.restore();
+}
 
 export type TilePosition = { x: number; y: number; size: number };
 type TileView = {
   root: Phaser.GameObjects.Container;
+  art: Phaser.GameObjects.Image;
   face: Phaser.GameObjects.Graphics;
   labels: Phaser.GameObjects.Text[];
   size: number;
@@ -80,12 +120,20 @@ function drawEdgeHint(face: Phaser.GameObjects.Graphics, size: number, sides: re
 export class TileRenderer extends Phaser.Scene {
   private views: TileView[] = [];
   private tiles: Tile[] = [];
+  private atlas!: Phaser.Textures.CanvasTexture;
 
   constructor(private readonly onReady: () => void) {
     super('tiles');
   }
 
   create() {
+    const dimension = textureSize * atlasColumns;
+    this.atlas = this.textures.createCanvas('metal-tile-faces', dimension, dimension)!;
+    for (let id = 0; id < atlasColumns ** 2; id++) {
+      const x = id % atlasColumns * textureSize;
+      const y = Math.floor(id / atlasColumns) * textureSize;
+      this.atlas.add(String(id), 0, x, y, textureSize, textureSize);
+    }
     this.onReady();
   }
 
@@ -99,18 +147,25 @@ export class TileRenderer extends Phaser.Scene {
     if (this.tiles === tiles) return;
     this.views.forEach(view => view.root.destroy());
     this.tiles = tiles;
-    this.views = tiles.map(tile => {
+    this.views = tiles.map((tile, id) => {
+      const digits = [tile.north, tile.east, tile.south, tile.west];
+      const frame = this.atlas.get(String(id));
+      paintMetalTile(this.atlas.context, frame.cutX, frame.cutY, digits);
+      const art = this.add.image(0, 0, this.atlas, frame.name).setOrigin(0);
       const face = this.add.graphics();
-      const labels = [tile.north, tile.east, tile.south, tile.west].map(number =>
+      const labels = digits.map(number =>
         this.add.text(0, 0, String(number), {
           fontFamily: 'system-ui, sans-serif',
           fontStyle: 'bold',
-          color: '#242639',
+          color: '#fff8e9',
+          stroke: '#111513',
+          strokeThickness: 2.5,
         }).setOrigin(.5),
       );
-      const root = this.add.container(0, 0, [face, ...labels]);
-      return { root, face, labels, size: 0 };
+      const root = this.add.container(0, 0, [art, face, ...labels]);
+      return { root, art, face, labels, size: 0 };
     });
+    this.atlas.refresh();
   }
 
   place(id: number, { x, y, size }: TilePosition, { raised = false, outlineColor, edgeHints, mark }: {
@@ -128,16 +183,11 @@ export class TileRenderer extends Phaser.Scene {
     view.edgeHints = edgeHints;
     view.mark = mark;
 
-    const { face, labels } = view;
-    const { north, east, south, west } = this.tiles[id];
-    const middle = size / 2;
+    const { art, face, labels } = view;
+    art.setDisplaySize(size, size);
     face.clear();
-    face.fillStyle(palette[north - 1]).fillTriangle(0, 0, size, 0, middle, middle);
-    face.fillStyle(palette[east - 1]).fillTriangle(size, 0, size, size, middle, middle);
-    face.fillStyle(palette[south - 1]).fillTriangle(size, size, 0, size, middle, middle);
-    face.fillStyle(palette[west - 1]).fillTriangle(0, size, 0, 0, middle, middle);
     if (mark === 'pencil') face.fillStyle(0xc4cbd4, .42).fillRect(0, 0, size, size);
-    face.lineStyle(1, 0x131826, .33)
+    face.lineStyle(1, 0x111513, .72)
       .lineBetween(0, 0, size, size).lineBetween(size, 0, 0, size);
     if (edgeHints) drawEdgeHint(face, size, edgeHints);
     if (outlineColor !== undefined) {

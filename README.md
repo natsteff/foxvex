@@ -2,7 +2,7 @@
 
 <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
 
-**Version 0.1.4 · Alpha**
+**Version 0.1.5 · Alpha**
 
 <p align="center">
   <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
@@ -59,7 +59,7 @@ The 3×3 puzzle with Cheat Mode enabled, Matching Assistant set to Highlight mis
 
 Tiles keep their orientation. A move into an occupied slot swaps the two tiles. **Matching Assistant** in Settings lets you prevent mismatches, highlight them in red (the default), or leave them unmarked. When Matching Assistant is **Off**, use **Check** to see whether any touching numbers differ.
 
-Open **New Puzzle**, choose **Board size** and **Difficulty**, then select **Start Puzzle**. The Play area heading shows the size and difficulty of the puzzle in progress. Easy has two forced corners and two more border clues. Normal has two border clues, and Hard has none. An edge with no match on the opposite side of any other tile must face out.
+Open **New Puzzle**, choose **Board size** and **Difficulty**, then select **Start Puzzle**. The Play area heading shows the size and difficulty of the puzzle in progress. Easy has two forced corners and two more border clues. Normal has two border clues, and Hard has none. Tiles use digits 0–9. Any digit can be a border clue if no other tile has a match on the opposite side.
 
 Turn on **Cheat Mode** in Settings to see cyan outlines on tiles with unmatched edges. Each notch marks a side with no opposite-side match on any other tile, so that side must face out. The marks follow the tile onto the board.
 

@@ -47,7 +47,7 @@ const grids = {
   tray: document.querySelector<HTMLDivElement>('#tray')!,
 };
 
-const saveKey = 'tetrahex.alpha.puzzle.v1';
+const saveKey = 'tetrahex.alpha.puzzle.v2';
 const layoutKey = 'tetrahex.alpha.small-layout.v1';
 const assistantKey = 'tetrahex.alpha.matching-assistant.v1';
 const cheatModeKey = 'tetrahex.alpha.cheat-mode.v1';
@@ -226,8 +226,8 @@ function scheduleDraw() {
   if (!animationFrame) animationFrame = requestAnimationFrame(draw);
 }
 
-function puzzleDescription(size: Size, difficulty?: Difficulty) {
-  const name = difficulty ? difficulty[0].toUpperCase() + difficulty.slice(1) : 'Classic';
+function puzzleDescription(size: Size, difficulty: Difficulty) {
+  const name = difficulty[0].toUpperCase() + difficulty.slice(1);
   return `${size} × ${size} · ${name}`;
 }
 
@@ -421,7 +421,7 @@ function replacePuzzle(size: Size, difficulty: Difficulty) {
 
 function openNewPuzzleDialog() {
   boardSize.value = String(puzzle.size);
-  difficultySelect.value = puzzle.difficulty ?? 'normal';
+  difficultySelect.value = puzzle.difficulty;
   newPuzzleWarning.hidden = isSolved(puzzle) || puzzle.moves === 0;
   newPuzzleDialog.showModal();
 }

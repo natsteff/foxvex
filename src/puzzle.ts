@@ -11,7 +11,7 @@ export type TileMark = 'pencil' | 'lock';
 export type Puzzle = Slots & {
   size: Size;
   seed: number;
-  difficulty?: Difficulty;
+  difficulty: Difficulty;
   tiles: Tile[];
   moves: number;
   revealed: boolean;
@@ -21,6 +21,7 @@ export type Puzzle = Slots & {
 export type Side = keyof Tile;
 const opposite: Record<Side, Side> = { north: 'south', east: 'west', south: 'north', west: 'east' };
 const sides = ['north', 'east', 'south', 'west'] as const;
+const edgeNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
 function isBorder(index: number, side: Side, size: Size) {
   switch (side) {
@@ -46,57 +47,82 @@ function shuffle<T>(items: T[], random: () => number) {
   return items;
 }
 
-function setBorderClues(tiles: Tile[], size: Size, difficulty: Difficulty, random: () => number) {
-  const borders = tiles.flatMap((_, index) => {
+function chooseBorderClues(size: Size, difficulty: Difficulty, random: () => number) {
+  const clues = new Map<number, Side[]>();
+  if (difficulty === 'hard') return clues;
+
+  const borders = Array.from({ length: size * size }, (_, index) => {
     const edges = sides.filter(side => isBorder(index, side, size));
-    return edges.length ? [{ index, edges }] : [];
-  });
-
-  // Every ordinary border edge matches an opposite interior edge on a different tile.
-  for (const { index, edges } of borders) {
-    for (const side of edges) {
-      const otherSide = opposite[side];
-      const candidates = tiles.filter((_, other) => other !== index && !isBorder(other, otherSide, size));
-      tiles[index][side] = candidates[Math.floor(random() * candidates.length)][otherSide];
-    }
-  }
-
-  if (difficulty === 'hard') return;
+    return { index, edges };
+  }).filter(({ edges }) => edges.length > 0);
   const corners = difficulty === 'easy'
     ? shuffle(borders.filter(({ edges }) => edges.length === 2), random).slice(0, 2)
     : [];
-  // Values 7–10 are reserved, one per direction, so no clue has an opposite match.
-  for (const { index, edges } of corners) {
-    for (const side of edges) tiles[index][side] = 7 + sides.indexOf(side);
-  }
-  const singles = shuffle(borders.filter(border => !corners.includes(border)), random).slice(0, 2);
-  for (const { index, edges } of singles) {
-    const side = edges[Math.floor(random() * edges.length)];
-    tiles[index][side] = 7 + sides.indexOf(side);
-  }
+  for (const { index, edges } of corners) clues.set(index, edges);
+  const singles = shuffle(borders.filter(({ index }) => !clues.has(index)), random).slice(0, 2);
+  for (const { index, edges } of singles) clues.set(index, [pick(edges, random)]);
+  return clues;
 }
 
-export function generate(size: Size, seed: number, difficulty?: Difficulty): Puzzle {
+function pick<T>(items: readonly T[], random: () => number): T {
+  return items[Math.floor(random() * items.length)];
+}
+
+function generateAxis(size: Size, clueSides: Side[], random: () => number) {
+  const interior = Array.from({ length: size * (size - 1) }, () => pick(edgeNumbers, random));
+  const clueValues: Partial<Record<Side, number>> = {};
+  if (clueSides.length > 0) {
+    const counts = Array<number>(edgeNumbers.length).fill(0);
+    for (const value of interior) counts[value]++;
+    // Prefer unused values. If the axis needs more, free the rarest values on that axis.
+    const ranked = shuffle([...edgeNumbers], random).sort((a, b) => counts[a] - counts[b]);
+    const reserved = ranked.slice(0, clueSides.length);
+    const ordinary = ranked.slice(clueSides.length);
+    clueSides.forEach((side, index) => { clueValues[side] = reserved[index]; });
+    interior.forEach((value, index) => {
+      if (reserved.includes(value)) interior[index] = pick(ordinary, random);
+    });
+  }
+
+  // Outer slots are filled after the interior pairs are assigned to tiles.
+  const border = Array<number>(size).fill(0);
+  return { edges: [...border, ...interior, ...border], clueValues };
+}
+
+export function generate(size: Size, seed: number, difficulty: Difficulty): Puzzle {
   let randomState = seed;
   function random() {
     randomState = (Math.imul(randomState, 1664525) + 1013904223) >>> 0;
     return randomState / 4294967296;
   }
 
-  const edge = () => 1 + Math.floor(random() * (difficulty ? 6 : 10));
-  const horizontal = Array.from({ length: (size + 1) * size }, edge);
-  const vertical = Array.from({ length: size * (size + 1) }, edge);
+  const clues = chooseBorderClues(size, difficulty, random);
+  const clueSides = new Set([...clues.values()].flat());
+  const horizontalClues = (['north', 'south'] as const).filter(side => clueSides.has(side));
+  const verticalClues = (['east', 'west'] as const).filter(side => clueSides.has(side));
+  const horizontal = generateAxis(size, horizontalClues, random);
+  const vertical = generateAxis(size, verticalClues, random);
+  const clueValues = { ...horizontal.clueValues, ...vertical.clueValues };
   const tiles = Array.from({ length: size * size }, (_, index) => {
-    const verticalIndex = index + Math.floor(index / size);
+    const verticalIndex = (index % size) * size + Math.floor(index / size);
     return {
-      north: horizontal[index],
-      east: vertical[verticalIndex + 1],
-      south: horizontal[index + size],
-      west: vertical[verticalIndex],
+      north: horizontal.edges[index],
+      east: vertical.edges[verticalIndex + size],
+      south: horizontal.edges[index + size],
+      west: vertical.edges[verticalIndex],
     };
   });
+  tiles.forEach((tile, index) => {
+    for (const side of sides) {
+      if (!isBorder(index, side, size)) continue;
+      const otherSide = opposite[side];
+      // Non-clue border edges have an opposite match on a different tile.
+      tile[side] = clues.get(index)?.includes(side)
+        ? clueValues[side]!
+        : pick(tiles.filter((_, other) => other !== index && !isBorder(other, otherSide, size)), random)[otherSide];
+    }
+  });
   const tray = shuffle(tiles.map((_, id) => id), random);
-  if (difficulty) setBorderClues(tiles, size, difficulty, random);
 
   return { size, seed, difficulty, tiles, board: tiles.map(() => null), tray, moves: 0, revealed: false, marks: {} };
 }
@@ -182,7 +208,7 @@ export function restore(value: unknown): Puzzle | null {
   if (!size || !sizes.includes(size) || seed === undefined || !Number.isInteger(seed) ||
       seed < 0 || seed > 0xffffffff || moves === undefined ||
       !Number.isSafeInteger(moves) || moves < 0 || typeof revealed !== 'boolean' ||
-      (difficulty !== undefined && !difficulties.includes(difficulty))) return null;
+      difficulty === undefined || !difficulties.includes(difficulty)) return null;
 
   const count = size * size;
   if (!Array.isArray(board) || !Array.isArray(tray) || board.length !== count || tray.length !== count) return null;
