@@ -2,7 +2,7 @@
 
 <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
 
-**Version 0.1.5 · Alpha**
+**Version 0.1.6 · Alpha**
 
 <p align="center">
   <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
