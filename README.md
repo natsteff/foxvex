@@ -1,11 +1,11 @@
 # FoxVex
 
-<img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
-
-**Version 0.1.8 · Alpha**
+<p align="center">
+  <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
+</p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.9 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -19,7 +19,7 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 - **Local saves** let you resume a puzzle in the same browser, including locked and penciled-in tiles. You can also undo moves or reveal the solution.
 - **Puzzle completion** shows your move count and a **Next Puzzle** button. Solve in one move per tile to earn a perfect-game badge and confetti.
 
-FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. Landscape puts the tray on the left and the board on the right. Phone portrait stacks the board above the tray. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. Controller support and FOX Arcade validation are planned.
+FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. Auto layout stacks the board above the tray in portrait, including on tablets, and puts the tray on the left in landscape. Settings also offers saved Stacked and Side by side preferences. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. Controller support and FOX Arcade validation are planned.
 
 ## Add FoxVex to your Home Screen
 
@@ -30,19 +30,21 @@ FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. L
 
 ## Mobile screenshots
 
-These screenshots show v0.1.2. The current layout opens size and difficulty controls from **New** (**New Puzzle** in landscape).
-
-The same 3×3 Normal puzzle in progress with default settings. Portrait stacks the play area above the tray. Landscape puts the tray on the left.
+The same 3×3 Normal puzzle in progress with the default Auto layout and Cheat Mode on. Portrait stacks the play area above the tray. Landscape puts the tray on the left.
 
 <img src="docs/screenshots/3x3-portrait.jpg" width="280" alt="3×3 FoxVex puzzle in portrait with four tiles placed">
 
 <img src="docs/screenshots/3x3-landscape.jpg" width="760" alt="The same 3×3 puzzle in landscape, with the tray on the left and the play area on the right">
 
-The 3×3 puzzle with Cheat Mode enabled, Matching Assistant set to Highlight mismatches, and Double-Tap Action set to Lock In. Cyan notches mark unmatched edges in the tray and on the board. The padlock marks a tile the player has locked in place.
+Settings shows the Board layout and sizing options. In the 3×3 game, cyan outlines and lime notches mark unmatched edges. A padlock marks a tile secured with Lock In.
 
 | Settings | 3×3 in progress |
 | --- | --- |
-| <img src="docs/screenshots/3x3-settings.jpg" width="280" alt="FoxVex Settings with Cheat Mode and Auto update on, Highlight mismatches, and Lock In"> | <img src="docs/screenshots/3x3-assisted.jpg" width="280" alt="3×3 puzzle with cyan edge clues and a locked tile on the board"> |
+| <img src="docs/screenshots/3x3-settings.jpg" width="280" alt="FoxVex Settings with Auto board layout, Fit screen sizing, Cheat Mode, and Lock In"> | <img src="docs/screenshots/3x3-assisted.jpg" width="280" alt="3×3 puzzle with cyan outlines, lime edge notches, and a locked tile on the board"> |
+
+Open **New** (**New Puzzle** in landscape) to choose a board size and difficulty. FoxVex replaces your current progress when you select **Start Puzzle**.
+
+<img src="docs/screenshots/new-puzzle.jpg" width="280" alt="New Puzzle dialog with board size, difficulty, and a warning about replacing current progress">
 
 **5×5 portrait** with default settings and eight tiles placed.
 
@@ -63,7 +65,9 @@ Select **New** (**New Puzzle** in landscape), choose **Board size** and **Diffic
 
 **Cheat Mode** outlines tiles with unmatched edges in cyan. Each lime notch marks a side with no opposite-side match on any other tile, so that side must face out. The marks follow the tile onto the board.
 
-On phones, the board sits above the tray in portrait. **Fit screen with smaller tiles** is the default. Choose **Scroll with larger tiles** in Settings if you prefer larger tiles. If the page scrolls, hold a dragged tile near the top or bottom of the screen to scroll.
+**Board layout** in Settings defaults to **Auto**, which stacks in portrait and uses side-by-side grids in landscape. Choose **Stacked** or **Side by side** to save a preference for any device. When the preferred arrangement would make tiles too small, FoxVex temporarily uses the other layout if it provides larger tiles, then restores your preference when there is room again.
+
+**Fit screen with smaller tiles** is the default sizing choice. Choose **Scroll with larger tiles** in Settings if you prefer larger tiles. If the page scrolls, hold a dragged tile near the top or bottom of the screen to scroll.
 
 The current puzzle saves in your browser. Undo history lasts until you reload or start a new puzzle. Solve reveals a valid arrangement and can be undone. Complete a puzzle yourself to see your move count and **Next Puzzle** in the tray.
 

@@ -143,6 +143,16 @@
       <p id="double-tap-help">On the board, double-tap, double-click, or press M on a focused tile to mark or unmark it. Locked tiles stay put until unlocked.</p>
     </div>
     <div class="setting-group">
+      <label for="board-layout">Board layout</label>
+      <select id="board-layout" aria-describedby="board-layout-help board-layout-status">
+        <option value="auto" selected>Auto</option>
+        <option value="stacked">Stacked</option>
+        <option value="side-by-side">Side by side</option>
+      </select>
+      <p id="board-layout-help">Auto stacks in portrait and places the tray on the left in landscape. Your preferred layout temporarily adjusts if the other arrangement keeps tiles more readable.</p>
+      <p id="board-layout-status" role="status" hidden></p>
+    </div>
+    <div class="setting-group">
       <label for="small-layout">Small-screen layout</label>
       <select id="small-layout" aria-describedby="layout-help">
         <option value="scroll">Scroll with larger tiles</option>

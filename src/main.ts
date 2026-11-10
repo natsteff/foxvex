@@ -32,6 +32,8 @@ const confirmTitle = document.querySelector<HTMLHeadingElement>('#confirm-title'
 const confirmMessage = document.querySelector<HTMLParagraphElement>('#confirm-message')!;
 const confirmButton = document.querySelector<HTMLButtonElement>('#confirm-action')!;
 const smallLayout = document.querySelector<HTMLSelectElement>('#small-layout')!;
+const boardLayout = document.querySelector<HTMLSelectElement>('#board-layout')!;
+const boardLayoutStatus = document.querySelector<HTMLParagraphElement>('#board-layout-status')!;
 const matchingAssistant = document.querySelector<HTMLSelectElement>('#matching-assistant')!;
 const placementHelp = document.querySelector<HTMLParagraphElement>('#placement-help')!;
 const cheatMode = document.querySelector<HTMLInputElement>('#cheat-mode')!;
@@ -39,7 +41,7 @@ const playMarking = document.querySelector<HTMLParagraphElement>('#play-marking'
 const playCheat = document.querySelector<HTMLParagraphElement>('#play-cheat')!;
 const playAssistant = document.querySelector<HTMLParagraphElement>('#play-assistant')!;
 const edgeTileLegend = document.querySelector<HTMLParagraphElement>('#edge-tile-legend')!;
-const stackedLayout = matchMedia('(max-width: 699px) and (orientation: portrait)');
+const portraitViewport = matchMedia('(orientation: portrait)');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const areas = ['board', 'tray'] as const;
 const grids = {
@@ -49,6 +51,7 @@ const grids = {
 
 const saveKey = 'tetrahex.alpha.puzzle.v2';
 const layoutKey = 'tetrahex.alpha.small-layout.v1';
+const boardLayoutKey = 'foxvex.board-layout.v1';
 const assistantKey = 'tetrahex.alpha.matching-assistant.v1';
 const cheatModeKey = 'tetrahex.alpha.cheat-mode.v1';
 const doubleTapKey = 'foxvex.double-tap-action.v1';
@@ -231,11 +234,14 @@ function puzzleDescription(size: Size, difficulty: Difficulty) {
   return `${size} × ${size} · ${name}`;
 }
 
-function resize() {
+type BoardLayout = 'stacked' | 'side-by-side';
+
+function measureLayout(layout: BoardLayout) {
+  arena.dataset.layout = layout;
   const rect = arena.getBoundingClientRect();
   const boardHeight = grids.board.getBoundingClientRect().height;
   const trayHeight = grids.tray.getBoundingClientRect().height;
-  const stacked = stackedLayout.matches;
+  const stacked = layout === 'stacked';
   const gridHeight = stacked ? boardHeight + trayHeight : Math.max(boardHeight, trayHeight);
   const panelSpace = rect.height - gridHeight;
   const pageTop = rect.top + window.scrollY;
@@ -243,10 +249,40 @@ function resize() {
   const visual = window.visualViewport;
   const viewportHeight = visual?.scale === 1 ? Math.min(innerHeight, visual.height) : innerHeight;
   const available = Math.floor((viewportHeight - pageTop - panelSpace - bottomPadding) / (stacked ? 2 : 1));
-  const minimumTile = smallLayout.value === 'fit' ? 26 : stacked ? 39 : 35;
-  const minimumGrid = puzzle.size * minimumTile + (puzzle.size - 1) * 6;
-  const gridSize = Math.min(430, Math.max(available, minimumGrid));
+  const gutters = parseFloat(getComputedStyle(arena).getPropertyValue('--grid-gutters'));
+  const widths = areas.map(area => {
+    const panel = grids[area].closest<HTMLElement>('.panel')!;
+    const style = getComputedStyle(panel);
+    return panel.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - gutters;
+  });
+  return Math.floor(Math.min(430, available, ...widths));
+}
+
+function resize() {
+  const preferred = boardLayout.value === 'auto'
+    ? portraitViewport.matches ? 'stacked' : 'side-by-side'
+    : boardLayout.value as BoardLayout;
+  const minimumGrid = (layout: BoardLayout) => {
+    const tile = smallLayout.value === 'fit' ? 26 : layout === 'stacked' ? 39 : 35;
+    return puzzle.size * tile + (puzzle.size - 1) * 6;
+  };
+  let layout = preferred;
+  let available = measureLayout(preferred);
+  if (available < minimumGrid(preferred)) {
+    const alternative = preferred === 'stacked' ? 'side-by-side' : 'stacked';
+    const alternativeSize = measureLayout(alternative);
+    if (alternativeSize > available) {
+      layout = alternative;
+      available = alternativeSize;
+    }
+  }
+  arena.dataset.layout = layout;
+  const gridSize = Math.max(available, minimumGrid(layout));
   arena.style.setProperty('--grid-max', `${gridSize}px`);
+  boardLayoutStatus.hidden = layout === preferred;
+  boardLayoutStatus.textContent = layout !== preferred
+    ? `Temporarily using ${layout === 'stacked' ? 'Stacked' : 'Side by side'} to keep tiles readable.`
+    : '';
   if (ready) scene.resize(layer.clientWidth, layer.clientHeight);
   scheduleDraw();
 }
@@ -709,6 +745,13 @@ cheatMode.addEventListener('change', () => {
 smallLayout.value = read(layoutKey) === 'scroll' ? 'scroll' : 'fit';
 smallLayout.addEventListener('change', () => {
   write(layoutKey, smallLayout.value);
+  scheduleLayout();
+});
+const savedBoardLayout = read(boardLayoutKey);
+boardLayout.value = savedBoardLayout === 'stacked' || savedBoardLayout === 'side-by-side'
+  ? savedBoardLayout : 'auto';
+boardLayout.addEventListener('change', () => {
+  write(boardLayoutKey, boardLayout.value);
   scheduleLayout();
 });
 updateHowToPlay();
