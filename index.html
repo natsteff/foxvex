@@ -30,7 +30,9 @@
   </section>
   <header class="topbar" inert>
     <div class="bar-inner">
-      <img class="wordmark" src="/src/assets/foxvex-wordmark.png" width="720" height="240" alt="FoxVex">
+      <button id="soundtrack-toggle" class="wordmark-toggle" type="button" aria-label="Play FoxVex soundtrack">
+        <img class="wordmark" src="/src/assets/foxvex-wordmark.png" width="720" height="240" alt="">
+      </button>
       <div class="header-actions" role="group" aria-label="Puzzle controls">
         <button id="undo" type="button" disabled>Undo</button>
         <button id="check" type="button" hidden>Check</button>
@@ -191,7 +193,7 @@
       </select>
       <label class="soundtrack-track-label" for="soundtrack-track">Track</label>
       <select id="soundtrack-track"></select>
-      <p id="soundtrack-help">Music starts after you interact with the game.</p>
+      <p id="soundtrack-help">Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.</p>
       <p id="soundtrack-status" role="status" hidden></p>
     </div>
     <details class="setting-group">

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.10 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.11 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -75,7 +75,7 @@ The current puzzle saves in your browser. Undo history lasts until you reload or
 
 The version appears during startup and in Settings. **Auto update** checks for a newer build when you open FoxVex or return to it. Use **Check for updates** in Settings to check manually.
 
-**Soundtrack** in Settings defaults to **Repeat (Random)**. Choose a track, switch to **Repeat (Sequential)**, or turn music **Off**. Music starts after you interact with the game. The alpha currently includes one test track, which loops in either repeat mode.
+**Soundtrack** in Settings defaults to **Repeat (Random)**. Choose a track, switch to **Repeat (Sequential)**, or turn music **Off**. Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode. The alpha currently includes one test track, which loops in either repeat mode.
 
 ## Run locally
 
