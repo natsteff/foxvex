@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import './style.css';
 import { generate, isSolved, mismatchedEdges, move, restore, sameSlot, sizes, solution, unmatchedSides } from './puzzle';
 import type { Area, Difficulty, Puzzle, Side, Size, Slot } from './puzzle';
 import { TileRenderer } from './renderer';
@@ -102,6 +101,7 @@ let ready = false;
 const scene = new TileRenderer(() => {
   ready = true;
   resize();
+  window.dispatchEvent(new Event('foxvex-ready'));
 });
 new Phaser.Game({
   type: Phaser.CANVAS,

@@ -4,19 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#131826">
-  <meta name="description" content="FoxVex is a drag-and-drop puzzle about matching numbered edges.">
+  <meta name="description" content="FoxVex is a browser or mobile based &quot;TetraVex&quot; style puzzle about matching numbered tile edges.">
   <meta name="apple-mobile-web-app-title" content="FoxVex">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/foxvex-180.png">
   <link rel="icon" type="image/png" href="/foxvex-logo.png">
   <title>FoxVex — Edge-matching puzzle</title>
+  <style>
+    #startup-screen { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; padding: 20px; background: #131826; color: #f0f2fa; font: 1rem system-ui, sans-serif; text-align: center; }
+    #startup-screen[hidden] { display: none; }
+    #startup-screen h1 { margin: 8px 0 0; }
+    #startup-screen p { margin: 8px 0; }
+  </style>
 </head>
 <body>
-  <header class="topbar">
+  <section id="startup-screen" aria-labelledby="startup-title">
+    <div>
+      <img src="/icons/foxvex-192.png" width="96" height="96" alt="">
+      <h1 id="startup-title">FoxVex</h1>
+      <p>v__FOXVEX_VERSION__ · Alpha</p>
+      <p id="startup-status" role="status">Starting FoxVex…</p>
+      <a id="startup-retry" href="./" hidden>Try again</a>
+      <noscript><p>Enable JavaScript to play FoxVex.</p></noscript>
+    </div>
+  </section>
+  <header class="topbar" inert>
     <div class="bar-inner">
       <div class="brand">
         <img class="mark" src="/foxvex-logo.png" width="48" height="48" alt="">
-        <span>FoxVex</span><span class="alpha">ALPHA</span>
+        <span>FoxVex</span><span class="alpha">ALPHA · v__FOXVEX_VERSION__</span>
       </div>
       <button id="settings" class="settings" type="button" aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="#131826"/><circle cx="15" cy="17" r="2.5" fill="#131826"/></svg>
@@ -24,7 +40,7 @@
       </button>
     </div>
   </header>
-  <main>
+  <main inert>
     <div class="toolbar" aria-label="Puzzle controls">
       <div class="toolbar-group">
         <label class="size-control"><span>Size</span>
@@ -105,6 +121,13 @@
       <summary>How to Play</summary>
       <p>Drag tiles onto the board so the numbers on touching sides match. Drop onto an occupied square to swap tiles.</p>
     </details>
+    <div class="setting-group">
+      <strong>FoxVex v<span id="game-version">__FOXVEX_VERSION__</span> · Alpha</strong>
+      <label class="update-toggle"><input id="auto-update" type="checkbox" checked> Auto update</label>
+      <p>Check when FoxVex opens or returns to the foreground.</p>
+      <button id="check-updates" type="button">Check for updates</button>
+      <p id="update-status" role="status"></p>
+    </div>
     <form method="dialog"><button class="primary">Done</button></form>
   </dialog>
   <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
@@ -115,6 +138,6 @@
       <button id="confirm-action" class="primary" value="confirm"></button>
     </form>
   </dialog>
-  <script type="module" src="/src/main.ts"></script>
+  <script type="module" src="/src/startup.ts"></script>
 </body>
 </html>

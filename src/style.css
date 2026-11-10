@@ -39,6 +39,7 @@ button:disabled { opacity: .45; cursor: default; }
   padding: 3px 6px;
   font-size: .62rem;
   letter-spacing: .09em;
+  white-space: nowrap;
 }
 .settings { display: flex; align-items: center; gap: 6px; background: transparent; color: var(--muted); }
 .settings svg { width: 18px; height: 18px; }
@@ -122,6 +123,9 @@ dialog .cheat-setting { display: flex; align-items: center; gap: 6px; margin-bot
 dialog p { color: var(--muted); font-size: .85rem; }
 dialog form { display: flex; justify-content: flex-end; gap: 8px; }
 #settings-dialog form { margin-top: 18px; }
+.update-toggle, #check-updates { margin-top: 10px; }
+.update-toggle input { accent-color: var(--accent); }
+#startup-retry { color: var(--accent); }
 
 @media (max-width: 699px) {
   .bar-inner, main { width: calc(100% - 20px); }
@@ -156,6 +160,8 @@ dialog form { display: flex; justify-content: flex-end; gap: 8px; }
 
 @media (max-width: 349px) and (orientation: portrait) {
   .bar-inner { height: 43px; }
+  .alpha { font-size: .56rem; letter-spacing: .04em; }
+  .settings { gap: 4px; padding-inline: 7px; font-size: .85rem; }
   .toolbar button, .toolbar select { min-height: 36px; }
   .toolbar button { padding-inline: 5px; }
   #new { white-space: nowrap; }

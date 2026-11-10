@@ -2,7 +2,7 @@
 
 <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
 
-**Version 0.1.0 · Alpha**
+**Version 0.1.1 · Alpha**
 
 <p align="center">
   <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
@@ -43,6 +43,8 @@ Turn on **Cheat Mode** in Settings to see cyan outlines on tiles with unmatched 
 On phones, the board sits above the tray in portrait. In Settings, **Fit screen with smaller tiles** lets tiles shrink further when space is tight. If the page scrolls, hold a dragged tile near the top or bottom of the screen to scroll.
 
 The current puzzle saves in your browser. Undo history lasts until you reload or start a new puzzle. Solve reveals a valid arrangement and can be undone.
+
+The version appears during startup, in the Alpha badge, and in Settings. **Auto update** checks for a newer build when you open FoxVex or return to it. Use **Check for updates** in Settings to check manually.
 
 ## Run locally
 
