@@ -25,7 +25,7 @@ const nextPuzzle = document.querySelector<HTMLButtonElement>('#next-puzzle')!;
 const status = document.querySelector<HTMLParagraphElement>('#status')!;
 const progress = document.querySelector<HTMLSpanElement>('#progress')!;
 const remaining = document.querySelector<HTMLSpanElement>('#remaining')!;
-const moveCount = document.querySelector<HTMLParagraphElement>('#moves')!;
+const moveCount = document.querySelector<HTMLSpanElement>('#moves')!;
 const dialog = document.querySelector<HTMLDialogElement>('#settings-dialog')!;
 const confirmDialog = document.querySelector<HTMLDialogElement>('#confirm-dialog')!;
 const confirmTitle = document.querySelector<HTMLHeadingElement>('#confirm-title')!;
@@ -306,7 +306,7 @@ function render() {
       }
     });
   }
-  puzzleDetails.textContent = `· ${puzzleDescription(puzzle.size, puzzle.difficulty)}`;
+  puzzleDetails.textContent = puzzleDescription(puzzle.size, puzzle.difficulty);
   assistantMode.textContent = matchingAssistant.value;
   undoButton.disabled = history.length === 0;
   const solved = isSolved(puzzle);
@@ -579,7 +579,7 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 const layoutObserver = new ResizeObserver(scheduleLayout);
 layoutObserver.observe(arena);
-layoutObserver.observe(document.querySelector('.toolbar')!);
+layoutObserver.observe(document.querySelector('.topbar')!);
 
 arena.addEventListener('click', event => {
   if (event.detail !== 0 || press) return;
@@ -700,13 +700,13 @@ doubleTapAction.addEventListener('change', () => {
     render();
   }
 });
-cheatMode.checked = read(cheatModeKey) === 'true';
+cheatMode.checked = read(cheatModeKey) !== 'false';
 cheatMode.addEventListener('change', () => {
   write(cheatModeKey, String(cheatMode.checked));
   updateHowToPlay();
   render();
 });
-smallLayout.value = read(layoutKey) === 'fit' ? 'fit' : 'scroll';
+smallLayout.value = read(layoutKey) === 'scroll' ? 'scroll' : 'fit';
 smallLayout.addEventListener('change', () => {
   write(layoutKey, smallLayout.value);
   scheduleLayout();

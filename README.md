@@ -2,7 +2,7 @@
 
 <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
 
-**Version 0.1.6 · Alpha**
+**Version 0.1.7 · Alpha**
 
 <p align="center">
   <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
@@ -14,7 +14,7 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 
 - **Three difficulty levels** vary how many edges give away a tile’s position.
 - **Matching Assistant** can prevent mismatches, outline them in red, or leave them unmarked.
-- **Optional Cheat Mode** marks tiles that have an unmatched edge and must go on the border.
+- **Cheat Mode** marks tiles that have an unmatched edge and must go on the border. It starts enabled and can be turned off in Settings.
 - **Lock In and Pencil In** let you double-tap a placed tile to lock it in place or flag a tentative placement with a question mark.
 - **Local saves** let you resume a puzzle in the same browser, including locked and penciled-in tiles. You can also undo moves or reveal the solution.
 - **Puzzle completion** shows your move count and a **Next Puzzle** button. Solve in one move per tile to earn a perfect-game badge and confetti.
@@ -30,7 +30,7 @@ FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. L
 
 ## Mobile screenshots
 
-These screenshots show v0.1.2. The current layout opens size and difficulty controls from **New Puzzle** in the header.
+These screenshots show v0.1.2. The current layout opens size and difficulty controls from **New** (**New Puzzle** in landscape).
 
 The same 3×3 Normal puzzle in progress with default settings. Portrait stacks the play area above the tray. Landscape puts the tray on the left.
 
@@ -55,15 +55,15 @@ The 3×3 puzzle with Cheat Mode enabled, Matching Assistant set to Highlight mis
 | Move or swap a tile | Drag and drop | Tab between grids, use arrows to focus a slot, and press Enter or Space to pick up or drop |
 | Cancel a move | Release outside the grids | Escape |
 | Toggle **Lock In** or **Pencil In**, as selected in Settings | Double-tap or double-click a placed tile | Focus a placed tile and press M |
-| Undo, check, or reveal the solution | Use the puzzle toolbar | Tab to a toolbar control and press Enter |
+| Undo, check, or reveal the solution | Use the controls in the top bar | Tab to a top-bar control and press Enter |
 
 Tiles keep their orientation. A move into an occupied slot swaps the two tiles. **Matching Assistant** in Settings lets you prevent mismatches, highlight them in red (the default), or leave them unmarked. When Matching Assistant is **Off**, use **Check** to see whether any touching numbers differ.
 
-Open **New Puzzle**, choose **Board size** and **Difficulty**, then select **Start Puzzle**. The Play area heading shows the size and difficulty of the puzzle in progress. Easy has two forced corners and two more border clues. Normal has two border clues, and Hard has none. Tiles use digits 0–9. Any digit can be a border clue if no other tile has a match on the opposite side.
+Select **New** (**New Puzzle** in landscape), choose **Board size** and **Difficulty**, then select **Start Puzzle**. The Play area heading shows the size and difficulty of the puzzle in progress. Easy has two forced corners and two more border clues. Normal has two border clues, and Hard has none. Tiles use digits 0–9. Any digit can be a border clue if no other tile has a match on the opposite side.
 
-Turn on **Cheat Mode** in Settings to see cyan outlines on tiles with unmatched edges. Each notch marks a side with no opposite-side match on any other tile, so that side must face out. The marks follow the tile onto the board.
+**Cheat Mode** outlines tiles with unmatched edges in cyan. Each lime notch marks a side with no opposite-side match on any other tile, so that side must face out. The marks follow the tile onto the board.
 
-On phones, the board sits above the tray in portrait. In Settings, **Fit screen with smaller tiles** lets tiles shrink further when space is tight. If the page scrolls, hold a dragged tile near the top or bottom of the screen to scroll.
+On phones, the board sits above the tray in portrait. **Fit screen with smaller tiles** is the default. Choose **Scroll with larger tiles** in Settings if you prefer larger tiles. If the page scrolls, hold a dragged tile near the top or bottom of the screen to scroll.
 
 The current puzzle saves in your browser. Undo history lasts until you reload or start a new puzzle. Solve reveals a valid arrangement and can be undone. Complete a puzzle yourself to see your move count and **Next Puzzle** in the tray.
 

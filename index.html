@@ -31,47 +31,48 @@
   <header class="topbar" inert>
     <div class="bar-inner">
       <img class="wordmark" src="/src/assets/foxvex-wordmark.png" width="720" height="240" alt="FoxVex">
-      <div class="header-actions">
-        <button id="new" class="primary" type="button" aria-haspopup="dialog">New Puzzle</button>
-        <button id="settings" class="settings" type="button" aria-haspopup="dialog">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="#131826"/><circle cx="15" cy="17" r="2.5" fill="#131826"/></svg>
-          <span>Settings</span>
+      <div class="header-actions" role="group" aria-label="Puzzle controls">
+        <button id="undo" type="button" disabled>Undo</button>
+        <button id="check" type="button" hidden>Check</button>
+        <button id="solve" type="button" aria-haspopup="dialog">Solve</button>
+        <button id="new" class="primary" type="button" aria-haspopup="dialog">New<span class="landscape-only"> Puzzle</span></button>
+        <button id="settings" class="settings" type="button" aria-label="Settings" aria-haspopup="dialog" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true">
+            <path d="m9.5 3-.6 2.6-2 .9-2.4-1.1L2 9.6l2 1.7v2.4L2 15.4l2.5 4.2 2.4-1.1 2 .9.6 2.6h5l.6-2.6 2-.9 2.4 1.1 2.5-4.2-2-1.7v-2.4l2-1.7-2.5-4.2-2.4 1.1-2-.9-.6-2.6z"/>
+            <circle cx="12" cy="12.5" r="3"/>
+          </svg>
         </button>
       </div>
     </div>
   </header>
   <main inert>
-    <div class="toolbar" aria-label="Puzzle controls">
-      <div class="play-controls">
-        <div class="toolbar-group">
-          <button id="undo" type="button" disabled>Undo</button>
-          <button id="check" type="button" hidden>Check</button>
-          <button id="solve" type="button">Solve</button>
-        </div>
-        <div class="game-info">
-          <p id="status" role="status"></p>
-          <p id="moves" class="move-count"></p>
-        </div>
-      </div>
-    </div>
     <div id="arena" class="arena">
       <section class="panel board-panel" aria-labelledby="board-label">
         <header class="panel-heading">
           <h2 id="board-label">
-            Play area <span id="puzzle-details"></span>
+            <span class="visually-hidden">Play area </span><span id="puzzle-details"></span>
             <span class="assistant-details">· Assistant: <span id="assistant-mode"></span></span>
           </h2>
-          <span id="progress" class="count"></span>
+          <div class="board-counts count">
+            <span id="progress"></span><span aria-hidden="true">·</span><span id="moves"></span>
+          </div>
         </header>
-        <div id="board" class="grid" role="group" aria-label="Play area"></div>
+        <div class="grid-frame">
+          <span class="grid-label" aria-hidden="true">PLAY AREA</span>
+          <div id="board" class="grid" role="group" aria-label="Play area"></div>
+          <span class="grid-label" aria-hidden="true">PLAY AREA</span>
+        </div>
       </section>
       <section class="panel tray-panel" aria-labelledby="tray-label">
         <header class="panel-heading">
-          <h2 id="tray-label">Tile tray</h2>
+          <h2 id="tray-label" class="visually-hidden">Tile tray</h2>
+          <p id="status" role="status"></p>
           <span id="remaining" class="count"></span>
         </header>
-        <div class="tray-content">
+        <div class="grid-frame">
+          <span class="grid-label" aria-hidden="true">TILE TRAY</span>
           <div id="tray" class="grid" role="group" aria-label="Tile tray"></div>
+          <span class="grid-label" aria-hidden="true">TILE TRAY</span>
           <section id="victory" class="victory-overlay" aria-labelledby="victory-title" hidden>
             <div class="victory-card">
               <svg class="victory-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -129,8 +130,8 @@
       <p id="placement-help">Allows mismatches and outlines both tiles in red.</p>
     </div>
     <div class="setting-group">
-      <label class="cheat-setting"><input id="cheat-mode" type="checkbox" aria-describedby="cheat-help"> Cheat Mode</label>
-      <p id="cheat-help">Outlines tiles in cyan and marks the sides that must face out because they have no match.</p>
+      <label class="cheat-setting"><input id="cheat-mode" type="checkbox" aria-describedby="cheat-help" checked> Cheat Mode</label>
+      <p id="cheat-help">Outlines tiles in cyan. Lime notches mark the sides that must face out because they have no match.</p>
     </div>
     <div class="setting-group">
       <label for="double-tap-action">Double-Tap Action</label>
@@ -145,7 +146,7 @@
       <label for="small-layout">Small-screen layout</label>
       <select id="small-layout" aria-describedby="layout-help">
         <option value="scroll">Scroll with larger tiles</option>
-        <option value="fit">Fit screen with smaller tiles</option>
+        <option value="fit" selected>Fit screen with smaller tiles</option>
       </select>
       <p id="layout-help">Choose larger tiles with scrolling or let tiles shrink further to fit more of the puzzle on screen.</p>
     </div>
@@ -153,7 +154,7 @@
       <summary>How to Play</summary>
       <p>Drag tiles onto the board so the numbers on touching sides match. Drop onto an occupied square to swap tiles.</p>
       <p id="play-marking" hidden></p>
-      <p id="play-cheat" hidden>Cheat Mode outlines edge tiles in cyan. Each bright notch marks a side that must face the outside of the board. The hints stay with the tile when you move it.</p>
+      <p id="play-cheat" hidden>Cheat Mode outlines edge tiles in cyan. Each lime notch marks a side that must face the outside of the board. The hints stay with the tile when you move it.</p>
       <p id="play-assistant"></p>
     </details>
     <div class="setting-group">

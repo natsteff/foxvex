@@ -112,8 +112,8 @@ function drawEdgeHint(face: Phaser.GameObjects.Graphics, size: number, sides: re
     const y = centerY - height / 2;
     const cap = thickness / 2;
     face.fillStyle(cyan, .23).fillRoundedRect(x - 2, y - 2, width + 4, height + 4, cap + 2);
-    face.fillStyle(cyan).fillRoundedRect(x - 1, y - 1, width + 2, height + 2, cap + 1);
-    face.fillStyle(0xf4ffff).fillRoundedRect(x, y, width, height, cap);
+    face.fillStyle(0x17312b).fillRoundedRect(x - 1, y - 1, width + 2, height + 2, cap + 1);
+    face.fillStyle(0xc8fa55).fillRoundedRect(x, y, width, height, cap);
   }
 }
 
