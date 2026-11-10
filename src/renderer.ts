@@ -44,24 +44,24 @@ function drawTileMark(face: Phaser.GameObjects.Graphics, size: number, mark: Til
 
 function drawEdgeHint(face: Phaser.GameObjects.Graphics, size: number, sides: readonly Side[]) {
   const cyan = 0x00f6ff;
-  const near = -.5;
-  const far = size - near;
-  const span = far - near;
+  const stroke = 6;
+  const near = stroke / 2;
+  const span = size - stroke;
   const radius = Phaser.Math.Clamp(size * .06, 4, 8);
-  face.lineStyle(5, 0x072b35).strokeRoundedRect(near, near, span, span, radius);
-  face.lineStyle(12, cyan, .10).strokeRoundedRect(near, near, span, span, radius);
-  face.lineStyle(8, cyan, .24).strokeRoundedRect(near, near, span, span, radius);
-  face.lineStyle(4.5, cyan, .86).strokeRoundedRect(near, near, span, span, radius);
-  face.lineStyle(1.75, 0xe5ffff).strokeRoundedRect(near, near, span, span, radius);
+  face.lineStyle(12, cyan, .19).strokeRoundedRect(stroke, stroke, size - 2 * stroke, size - 2 * stroke, radius);
+  face.lineStyle(stroke, cyan, .92).strokeRoundedRect(near, near, span, span, radius);
+  face.lineStyle(2.5, 0xe5ffff).strokeRoundedRect(near, near, span, span, radius);
 
   const length = Phaser.Math.Clamp(size * .31, 11, 33);
   const thickness = Phaser.Math.Clamp(size * .065, 4.5, 7);
   const middle = size / 2;
+  const notchInset = thickness / 2 + 2;
+  const far = size - notchInset;
   const centers = {
-    north: [middle, near],
+    north: [middle, notchInset],
     east: [far, middle],
     south: [middle, far],
-    west: [near, middle],
+    west: [notchInset, middle],
   };
   for (const side of sides) {
     const [centerX, centerY] = centers[side];
@@ -71,7 +71,7 @@ function drawEdgeHint(face: Phaser.GameObjects.Graphics, size: number, sides: re
     const x = centerX - width / 2;
     const y = centerY - height / 2;
     const cap = thickness / 2;
-    face.fillStyle(cyan, .23).fillRoundedRect(x - 3, y - 3, width + 6, height + 6, cap + 3);
+    face.fillStyle(cyan, .23).fillRoundedRect(x - 2, y - 2, width + 4, height + 4, cap + 2);
     face.fillStyle(cyan).fillRoundedRect(x - 1, y - 1, width + 2, height + 2, cap + 1);
     face.fillStyle(0xf4ffff).fillRoundedRect(x, y, width, height, cap);
   }
@@ -141,7 +141,7 @@ export class TileRenderer extends Phaser.Scene {
       .lineBetween(0, 0, size, size).lineBetween(size, 0, 0, size);
     if (edgeHints) drawEdgeHint(face, size, edgeHints);
     if (outlineColor !== undefined) {
-      const inset = edgeHints ? 4.5 : 1.5;
+      const inset = edgeHints ? 7.5 : 1.5;
       face.lineStyle(3, outlineColor).strokeRect(inset, inset, size - 2 * inset, size - 2 * inset);
     }
     if (mark) drawTileMark(face, size, mark);

@@ -8,6 +8,9 @@ const arena = document.querySelector<HTMLDivElement>('#arena')!;
 const layer = document.querySelector<HTMLDivElement>('#render-layer')!;
 const boardSize = document.querySelector<HTMLSelectElement>('#size')!;
 const difficultySelect = document.querySelector<HTMLSelectElement>('#difficulty')!;
+const newPuzzleDialog = document.querySelector<HTMLDialogElement>('#new-puzzle-dialog')!;
+const newPuzzleForm = document.querySelector<HTMLFormElement>('#new-puzzle-form')!;
+const newPuzzleWarning = document.querySelector<HTMLParagraphElement>('#new-puzzle-warning')!;
 const doubleTapAction = document.querySelector<HTMLSelectElement>('#double-tap-action')!;
 const puzzleDetails = document.querySelector<HTMLSpanElement>('#puzzle-details')!;
 const assistantMode = document.querySelector<HTMLSpanElement>('#assistant-mode')!;
@@ -416,16 +419,11 @@ function replacePuzzle(size: Size, difficulty: Difficulty) {
   announce('New puzzle ready.');
 }
 
-function startPuzzle() {
-  const size = Number(boardSize.value) as Size;
-  if (!sizes.includes(size)) return;
-  const difficulty = difficultySelect.value as Difficulty;
-  if (puzzle.board.some(id => id !== null) && !isSolved(puzzle)) {
-    const description = puzzleDescription(size, difficulty);
-    confirmAction('Start a new puzzle?', `Start ${description} and replace your current progress?`, 'New puzzle', () => replacePuzzle(size, difficulty));
-  } else {
-    replacePuzzle(size, difficulty);
-  }
+function openNewPuzzleDialog() {
+  boardSize.value = String(puzzle.size);
+  difficultySelect.value = puzzle.difficulty ?? 'normal';
+  newPuzzleWarning.hidden = isSolved(puzzle) || puzzle.moves === 0;
+  newPuzzleDialog.showModal();
 }
 
 function slotFor(element: EventTarget | null): Slot | null {
@@ -636,18 +634,20 @@ arena.addEventListener('keydown', event => {
   cellAt(next).focus();
 });
 
-document.querySelector('#new')!.addEventListener('click', startPuzzle);
-nextPuzzle.addEventListener('click', () => {
-  startPuzzle();
+document.querySelector('#new')!.addEventListener('click', openNewPuzzleDialog);
+nextPuzzle.addEventListener('click', openNewPuzzleDialog);
+newPuzzleForm.addEventListener('submit', event => {
+  event.preventDefault();
+  if (!(event.submitter instanceof HTMLButtonElement) || event.submitter.value !== 'start') {
+    newPuzzleDialog.close();
+    return;
+  }
+  const size = Number(boardSize.value) as Size;
+  if (!sizes.includes(size)) return;
+  newPuzzleDialog.close();
+  replacePuzzle(size, difficultySelect.value as Difficulty);
   cellAt({ area: 'tray', index: 0 }).focus({ preventScroll: true });
 });
-function announceNextPuzzle() {
-  const size = Number(boardSize.value) as Size;
-  const difficulty = difficultySelect.value as Difficulty;
-  announce(`Next puzzle: ${puzzleDescription(size, difficulty)}. Choose New puzzle to start.`);
-}
-boardSize.addEventListener('change', announceNextPuzzle);
-difficultySelect.addEventListener('change', announceNextPuzzle);
 
 undoButton.addEventListener('click', () => {
   const previous = history.pop();
@@ -689,8 +689,6 @@ matchingAssistant.addEventListener('change', () => {
   render();
   announce(placementHelp.textContent);
 });
-boardSize.value = String(puzzle.size);
-difficultySelect.value = puzzle.difficulty ?? 'normal';
 doubleTapAction.addEventListener('change', () => {
   lastTap = null;
   write(doubleTapKey, doubleTapAction.value);

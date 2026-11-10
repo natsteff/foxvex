@@ -7,8 +7,8 @@
   <meta name="description" content="FoxVex is a browser or mobile based &quot;TetraVex&quot; style puzzle about matching numbered tile edges.">
   <meta name="apple-mobile-web-app-title" content="FoxVex">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/foxvex-180.png">
-  <link rel="icon" type="image/png" href="/foxvex-logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/foxvex-app-180.png">
+  <link rel="icon" type="image/png" href="/icons/foxvex-app-192.png">
   <title>FoxVex — Edge-matching puzzle</title>
   <style>
     #startup-screen { position: fixed; inset: 0; z-index: 3; display: grid; place-items: center; padding: 20px; background: #131826; color: #f0f2fa; font: 1rem system-ui, sans-serif; text-align: center; }
@@ -20,7 +20,7 @@
 <body>
   <section id="startup-screen" aria-labelledby="startup-title">
     <div>
-      <img src="/icons/foxvex-192.png" width="96" height="96" alt="">
+      <img src="/icons/foxvex-app-192.png" width="96" height="96" alt="">
       <h1 id="startup-title">FoxVex</h1>
       <p>v__FOXVEX_VERSION__ · Alpha</p>
       <p id="startup-status" role="status">Starting FoxVex…</p>
@@ -30,34 +30,18 @@
   </section>
   <header class="topbar" inert>
     <div class="bar-inner">
-      <div class="brand">
-        <img class="mark" src="/foxvex-logo.png" width="48" height="48" alt="">
-        <span>FoxVex</span><span class="alpha">ALPHA · v__FOXVEX_VERSION__</span>
+      <img class="wordmark" src="/foxvex-wordmark.png" width="720" height="240" alt="FoxVex">
+      <div class="header-actions">
+        <button id="new" class="primary" type="button" aria-haspopup="dialog">New Puzzle</button>
+        <button id="settings" class="settings" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="#131826"/><circle cx="15" cy="17" r="2.5" fill="#131826"/></svg>
+          <span>Settings</span>
+        </button>
       </div>
-      <button id="settings" class="settings" type="button" aria-haspopup="dialog">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="#131826"/><circle cx="15" cy="17" r="2.5" fill="#131826"/></svg>
-        <span>Settings</span>
-      </button>
     </div>
   </header>
   <main inert>
     <div class="toolbar" aria-label="Puzzle controls">
-      <div class="toolbar-group">
-        <label class="size-control"><span>Size</span>
-          <select id="size" aria-label="Board size" title="Applies to the next puzzle">
-            <option value="2">2 × 2</option><option value="3">3 × 3</option>
-            <option value="4" selected>4 × 4</option><option value="5">5 × 5</option>
-          </select>
-        </label>
-        <label class="size-control">Difficulty
-          <select id="difficulty" title="Applies to the next puzzle">
-            <option value="easy">Easy</option>
-            <option value="normal" selected>Normal</option>
-            <option value="hard">Hard</option>
-          </select>
-        </label>
-        <button id="new" class="primary" type="button"><span aria-hidden="true">+</span> New puzzle</button>
-      </div>
       <div class="play-controls">
         <div class="toolbar-group">
           <button id="undo" type="button" disabled>Undo</button>
@@ -96,7 +80,7 @@
               <h3 id="victory-title">Puzzle solved!</h3>
               <p id="victory-perfect" hidden>PERFECT GAME!!!</p>
               <p id="victory-moves"></p>
-              <button id="next-puzzle" class="primary" type="button">Next Puzzle</button>
+              <button id="next-puzzle" class="primary" type="button" aria-haspopup="dialog">Next Puzzle</button>
             </div>
           </section>
         </div>
@@ -106,6 +90,33 @@
     </div>
   </main>
   <div id="confetti" aria-hidden="true"></div>
+  <dialog id="new-puzzle-dialog" aria-labelledby="new-puzzle-title">
+    <h2 id="new-puzzle-title">New Puzzle</h2>
+    <form id="new-puzzle-form" method="dialog">
+      <div class="puzzle-options">
+        <div>
+          <label for="size">Board size</label>
+          <select id="size">
+            <option value="2">2 × 2</option><option value="3">3 × 3</option>
+            <option value="4" selected>4 × 4</option><option value="5">5 × 5</option>
+          </select>
+        </div>
+        <div>
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+      <p id="new-puzzle-warning" hidden>Starting a new puzzle will replace your current progress.</p>
+      <div class="dialog-actions">
+        <button value="cancel" autofocus>Cancel</button>
+        <button class="primary" value="start">Start Puzzle</button>
+      </div>
+    </form>
+  </dialog>
   <dialog id="settings-dialog" aria-labelledby="settings-heading">
     <h2 id="settings-heading" tabindex="-1" autofocus>Settings</h2>
     <div class="setting-group">

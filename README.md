@@ -2,7 +2,7 @@
 
 <img src="public/foxvex-logo.png" width="280" alt="FoxVex logo">
 
-**Version 0.1.3 · Alpha**
+**Version 0.1.4 · Alpha**
 
 <p align="center">
   <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now"></a>
@@ -29,6 +29,8 @@ FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. L
 4. Launch **FoxVex** from its fox logo. Internet access is required to load the game.
 
 ## Mobile screenshots
+
+These screenshots show v0.1.2. The current layout opens size and difficulty controls from **New Puzzle** in the header.
 
 The same 3×3 Normal puzzle in progress with default settings. Portrait stacks the play area above the tray. Landscape puts the tray on the left.
 
@@ -57,7 +59,7 @@ The 3×3 puzzle with Cheat Mode enabled, Matching Assistant set to Highlight mis
 
 Tiles keep their orientation. A move into an occupied slot swaps the two tiles. **Matching Assistant** in Settings lets you prevent mismatches, highlight them in red (the default), or leave them unmarked. When Matching Assistant is **Off**, use **Check** to see whether any touching numbers differ.
 
-Choose **Size** and **Difficulty**, then select **New puzzle** to apply them. The Play area heading shows the size and difficulty of the puzzle in progress. Easy has two forced corners and two more border clues. Normal has two border clues, and Hard has none. An edge with no match on the opposite side of any other tile must face out.
+Open **New Puzzle**, choose **Board size** and **Difficulty**, then select **Start Puzzle**. The Play area heading shows the size and difficulty of the puzzle in progress. Easy has two forced corners and two more border clues. Normal has two border clues, and Hard has none. An edge with no match on the opposite side of any other tile must face out.
 
 Turn on **Cheat Mode** in Settings to see cyan outlines on tiles with unmatched edges. Each notch marks a side with no opposite-side match on any other tile, so that side must face out. The marks follow the tile onto the board.
 
@@ -67,7 +69,7 @@ The current puzzle saves in your browser. Undo history lasts until you reload or
 
 **Double-Tap Action** in Settings defaults to **Lock In**. A locked tile stays put until you unlock it. Choose **Pencil In** to mark tentative placements with a centered question mark or **Disabled** to turn off the gesture. Tile marks save with the current puzzle and can be undone during play.
 
-The version appears during startup, in the Alpha badge, and in Settings. **Auto update** checks for a newer build when you open FoxVex or return to it. Use **Check for updates** in Settings to check manually.
+The version appears during startup and in Settings. **Auto update** checks for a newer build when you open FoxVex or return to it. Use **Check for updates** in Settings to check manually.
 
 ## Run locally
 
