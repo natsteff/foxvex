@@ -53,10 +53,12 @@ main { padding-block: 10px 8px; }
 #assistant-mode { text-transform: capitalize; }
 .count { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .board-counts { display: flex; align-items: center; gap: 4px; }
-#edge-tile-legend { color: #69eaf0; font-size: .75rem; margin: 6px auto 0; width: min(100%, var(--grid-max)); }
+#edge-tile-legend { color: #69eaf0; font-size: .75rem; margin: 6px 0 0; text-align: center; }
 .grid-frame { position: relative; width: min(100%, calc(var(--grid-max) + 28px)); margin-inline: auto; }
 .grid-label {
   position: absolute;
+  display: flex;
+  gap: .9em;
   top: 50%;
   transform: translateY(-50%);
   writing-mode: vertical-rl;
@@ -180,6 +182,7 @@ dialog form, .dialog-actions { display: flex; justify-content: flex-end; gap: 8p
 }
 
 @media (max-width: 699px) and (orientation: portrait) {
+  .topbar { padding-top: 8px; }
   .arena { grid-template-columns: 1fr; }
 }
 

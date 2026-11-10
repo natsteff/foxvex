@@ -3,20 +3,21 @@ import { sizes } from './puzzle';
 import type { Side, Tile, TileMark } from './puzzle';
 
 const palette = [
-  ['#293336', '#69777b', '#bfcbcd'],
-  ['#3e2309', '#c68a21', '#f6cf65'],
-  ['#072e38', '#087d83', '#46c6bd'],
-  ['#0b361e', '#16863d', '#69d67d'],
-  ['#41121c', '#ad3049', '#f37d89'],
-  ['#321547', '#8840b9', '#cd8cf0'],
-  ['#4c2316', '#b05a2d', '#f4a16c'],
-  ['#14294f', '#2f69b4', '#74b8fa'],
-  ['#400f32', '#a03479', '#e776b5'],
-  ['#222141', '#4d4b9e', '#9999e4'],
+  ['#4c595c', '#69777b', '#bfcbcd'],
+  ['#925f18', '#c68a21', '#f6cf65'],
+  ['#095961', '#087d83', '#46c6bd'],
+  ['#12602f', '#16863d', '#69d67d'],
+  ['#782338', '#ad3049', '#f37d89'],
+  ['#642e8a', '#8840b9', '#cd8cf0'],
+  ['#843f23', '#b05a2d', '#f4a16c'],
+  ['#24518c', '#2f69b4', '#74b8fa'],
+  ['#772858', '#a03479', '#e776b5'],
+  ['#3a397a', '#4d4b9e', '#9999e4'],
 ];
 const textureSize = 160;
 const atlasColumns = Math.max(...sizes);
 const corners = [[0, 0], [textureSize, 0], [textureSize, textureSize], [0, textureSize]] as const;
+const numberPositions = [[.5, .215], [.785, .5], [.5, .785], [.215, .5]] as const;
 
 function paintMetalTile(context: CanvasRenderingContext2D, x: number, y: number, digits: number[]) {
   context.save();
@@ -25,14 +26,16 @@ function paintMetalTile(context: CanvasRenderingContext2D, x: number, y: number,
   context.fillRect(0, 0, textureSize, textureSize);
   const middle = textureSize / 2;
   digits.forEach((digit, index) => {
-    const [shadow, base, sheen] = palette[digit];
-    const gradient = context.createLinearGradient(0, textureSize, textureSize, 0);
-    gradient.addColorStop(0, shadow);
-    gradient.addColorStop(.36, base);
-    gradient.addColorStop(.48, sheen);
-    gradient.addColorStop(.54, base);
-    gradient.addColorStop(.76, shadow);
-    gradient.addColorStop(1, base);
+    const [edge, base, sheen] = palette[digit];
+    const [labelX, labelY] = numberPositions[index];
+    const centerX = labelX * textureSize;
+    const centerY = labelY * textureSize;
+    // End the sheen inside all three sides so matching faces share one edge color.
+    const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, textureSize * .195);
+    gradient.addColorStop(0, sheen);
+    gradient.addColorStop(.18, sheen);
+    gradient.addColorStop(.61, base);
+    gradient.addColorStop(1, edge);
     const [startX, startY] = corners[index];
     const [endX, endY] = corners[(index + 1) % corners.length];
     context.fillStyle = gradient;
@@ -94,25 +97,22 @@ function drawEdgeHint(face: Phaser.GameObjects.Graphics, size: number, sides: re
 
   const length = Phaser.Math.Clamp(size * .31, 11, 33);
   const thickness = Phaser.Math.Clamp(size * .065, 4.5, 7);
-  const middle = size / 2;
-  const notchInset = thickness / 2 + 2;
-  const far = size - notchInset;
-  const centers = {
-    north: [middle, notchInset],
-    east: [far, middle],
-    south: [middle, far],
-    west: [notchInset, middle],
+  const start = (size - length) / 2;
+  const far = size - thickness;
+  const notches = {
+    north: { x: start, y: 0, width: length, height: thickness },
+    east: { x: far, y: start, width: thickness, height: length },
+    south: { x: start, y: far, width: length, height: thickness },
+    west: { x: 0, y: start, width: thickness, height: length },
   };
   for (const side of sides) {
-    const [centerX, centerY] = centers[side];
-    const vertical = side === 'east' || side === 'west';
-    const width = vertical ? thickness : length;
-    const height = vertical ? length : thickness;
-    const x = centerX - width / 2;
-    const y = centerY - height / 2;
+    const { x, y, width, height } = notches[side];
     const cap = thickness / 2;
-    face.fillStyle(cyan, .23).fillRoundedRect(x - 2, y - 2, width + 4, height + 4, cap + 2);
-    face.fillStyle(0x17312b).fillRoundedRect(x - 1, y - 1, width + 2, height + 2, cap + 1);
+    const keyX = Math.max(0, x - 1);
+    const keyY = Math.max(0, y - 1);
+    const keyWidth = Math.min(size, x + width + 1) - keyX;
+    const keyHeight = Math.min(size, y + height + 1) - keyY;
+    face.fillStyle(0x17312b).fillRoundedRect(keyX, keyY, keyWidth, keyHeight, cap + .5);
     face.fillStyle(0xc8fa55).fillRoundedRect(x, y, width, height, cap);
   }
 }
@@ -195,9 +195,8 @@ export class TileRenderer extends Phaser.Scene {
       face.lineStyle(3, outlineColor).strokeRect(inset, inset, size - 2 * inset, size - 2 * inset);
     }
     if (mark) drawTileMark(face, size, mark);
-    const positions = [[.5, .215], [.785, .5], [.5, .785], [.215, .5]];
     labels.forEach((label, index) => {
-      const [labelX, labelY] = positions[index];
+      const [labelX, labelY] = numberPositions[index];
       label.setPosition(labelX * size, labelY * size)
         .setFontSize(Math.min(28, Math.max(11, Math.floor(size * .23))));
     });
