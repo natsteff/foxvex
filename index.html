@@ -157,28 +157,6 @@
     </header>
     <div class="settings-content">
     <div class="setting-group">
-      <label for="soundtrack-mode">Soundtrack</label>
-      <select id="soundtrack-mode" aria-describedby="soundtrack-help">
-        <option value="sequential">Repeat (Sequential)</option>
-        <option value="random" selected>Repeat (Random)</option>
-        <option value="off">Off</option>
-      </select>
-      <details class="soundtrack-playlist">
-        <summary>Playlist</summary>
-        <div id="soundtrack-playlist" role="group" aria-label="Playlist"></div>
-      </details>
-      <label class="cheat-setting"><input id="soundtrack-quality" type="checkbox"> High quality audio</label>
-      <p>Quality changes apply when the next track or preview starts.</p>
-      <label class="soundtrack-track-label" for="soundtrack-track">Track Preview</label>
-      <div class="soundtrack-preview">
-        <select id="soundtrack-track"></select>
-        <button id="soundtrack-preview" type="button">Preview</button>
-      </div>
-      <p id="soundtrack-preview-status" role="status" hidden></p>
-      <p id="soundtrack-help">Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.</p>
-      <p id="soundtrack-status" role="status" hidden></p>
-    </div>
-    <div class="setting-group">
       <label for="matching-assistant">Matching Assistant</label>
       <select id="matching-assistant" aria-describedby="placement-help">
         <option value="prevent">Prevent mismatches</option>
@@ -217,6 +195,28 @@
         <option value="fit" selected>Fit screen with smaller tiles</option>
       </select>
       <p id="layout-help">Choose larger tiles with scrolling or let tiles shrink further to fit more of the puzzle on screen.</p>
+    </div>
+    <div class="setting-group">
+      <label for="soundtrack-mode">Soundtrack</label>
+      <select id="soundtrack-mode" aria-describedby="soundtrack-help">
+        <option value="sequential">Repeat (Sequential)</option>
+        <option value="random" selected>Repeat (Random)</option>
+        <option value="off">Off</option>
+      </select>
+      <details class="soundtrack-playlist">
+        <summary>Playlist</summary>
+        <div id="soundtrack-playlist" role="group" aria-label="Playlist"></div>
+      </details>
+      <label class="cheat-setting"><input id="soundtrack-quality" type="checkbox"> High quality audio</label>
+      <p>Quality changes apply when the next track or preview starts.</p>
+      <label class="soundtrack-track-label" for="soundtrack-track">Track Preview</label>
+      <div class="soundtrack-preview">
+        <select id="soundtrack-track"></select>
+        <button id="soundtrack-preview" type="button">Preview</button>
+      </div>
+      <p id="soundtrack-preview-status" role="status" hidden></p>
+      <p id="soundtrack-help">Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.</p>
+      <p id="soundtrack-status" role="status" hidden></p>
     </div>
     <details class="setting-group">
       <summary>How to Play</summary>
