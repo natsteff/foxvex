@@ -22,7 +22,8 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   const toggle = document.querySelector<HTMLButtonElement>('#soundtrack-toggle')!;
   const wordmark = document.querySelector<HTMLImageElement>('.wordmark')!;
   const loading = document.querySelector<HTMLSpanElement>('#soundtrack-loading')!;
-  const nowPlaying = document.querySelector<HTMLParagraphElement>('#now-playing')!;
+  const nowPlaying = document.querySelector<HTMLButtonElement>('#now-playing')!;
+  const nowPlayingTitle = document.querySelector<HTMLSpanElement>('#now-playing-title')!;
   const standardLogo = wordmark.src;
   const musicLogo = new URL('./assets/foxvex-wordmark-music.png', import.meta.url).href;
   const modeKey = 'foxvex.soundtrack-mode.v1';
@@ -50,6 +51,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   let resumeMusicOnReturn = false;
   let resumePreviewOnReturn = false;
   let lastTap: number | undefined;
+  let lastTrackTap: number | undefined;
   const initialIndex = mode.value === 'random' ? Math.floor(Math.random() * selectedIds.length) : 0;
   const savedTrackId = read(trackKey);
   let currentId = savedTrackId && selectedIds.includes(savedTrackId) ? savedTrackId : selectedIds[initialIndex];
@@ -78,9 +80,19 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     toggle.toggleAttribute('data-paused', mode.value !== 'off' && audio.paused);
     nowPlaying.hidden = mode.value === 'off' || !audio.getAttribute('src');
     const currentTrack = tracks.find(item => item.id === currentId)!;
-    nowPlaying.textContent = `♪ ${currentTrack.name}`;
-    nowPlaying.setAttribute('aria-label', `Soundtrack: ${currentTrack.name}`);
+    const title = `♪ ${currentTrack.name}`;
+    if (nowPlayingTitle.textContent !== title) nowPlayingTitle.textContent = title;
+    nowPlaying.setAttribute('aria-label', `${currentTrack.name}. Double-tap to skip to the next track.`);
+    updateTrackScroll();
   }
+
+  function updateTrackScroll() {
+    const overflow = Math.max(0, nowPlayingTitle.scrollWidth - nowPlaying.clientWidth);
+    nowPlaying.toggleAttribute('data-scroll', overflow > 0);
+    nowPlaying.style.setProperty('--track-scroll-distance', `${overflow}px`);
+    nowPlaying.style.setProperty('--track-scroll-duration', `${Math.max(8, overflow / 20 + 4)}s`);
+  }
+  new ResizeObserver(updateTrackScroll).observe(nowPlaying);
 
   function updateControls() {
     wordmark.src = mode.value !== 'off' ? musicLogo : standardLogo;
@@ -242,7 +254,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     status.textContent = 'This track is unavailable. Tap to retry.';
     status.hidden = false;
   });
-  audio.addEventListener('ended', () => {
+  function nextTrack() {
     const candidates = selectedIds.filter(id => id !== currentId);
     if (mode.value === 'random' && candidates.length) {
       currentId = candidates[Math.floor(Math.random() * candidates.length)];
@@ -253,6 +265,17 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     }
     write(trackKey, currentId);
     playTrack(true);
+  }
+  audio.addEventListener('ended', nextTrack);
+  nowPlaying.addEventListener('click', event => {
+    if (backgrounded || mode.value === 'off' || previewSession) return;
+    const now = performance.now();
+    const keyboardActivation = event.detail === 0;
+    const doubleTap = lastTrackTap !== undefined && now - lastTrackTap <= 360;
+    lastTrackTap = keyboardActivation || doubleTap ? undefined : now;
+    if (!keyboardActivation && !doubleTap) return;
+    pausedByPlayer = false;
+    nextTrack();
   });
 
   function pauseForBackground() {
@@ -284,7 +307,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   window.addEventListener('pageshow', resumeFromBackground);
 
   function startFromInteraction(event: Event) {
-    if (!event.isTrusted || event.composedPath().includes(toggle)) return;
+    if (!event.isTrusted || event.composedPath().includes(toggle) || event.composedPath().includes(nowPlaying)) return;
     lastTap = undefined;
     playTrack();
   }

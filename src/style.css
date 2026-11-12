@@ -61,7 +61,7 @@ main { padding-block: 10px 8px; }
 #assistant-mode { text-transform: capitalize; }
 .count { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .board-counts { display: flex; align-items: center; gap: 4px; }
-#edge-tile-legend { color: #69eaf0; font-size: .75rem; margin: 6px 0 0; text-align: center; }
+#edge-tile-legend { color: #69eaf0; }
 .grid-frame { position: relative; --grid-width: min(calc(100% - var(--grid-gutters)), var(--grid-max)); }
 .grid-label {
   position: absolute;
@@ -245,6 +245,13 @@ dialog form, .dialog-actions { display: flex; justify-content: flex-end; gap: 8p
 @keyframes song-loading-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 @media (prefers-reduced-motion: reduce) { #soundtrack-loading { animation: none; } }
 
-.tray-heading-text { min-width: 0; }
-#now-playing { margin: 0 0 3px; color: var(--accent); font-weight: 600; overflow-wrap: anywhere; }
+.tray-heading-text { min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 8px; }
+#now-playing { display: block; width: 100%; min-height: 0; margin: 6px 0 0; padding: 0; border: 0; background: transparent; overflow: hidden; text-align: left; color: var(--accent); font-size: .75rem; font-weight: 600; touch-action: manipulation; }
+#now-playing-title { display: inline-block; white-space: nowrap; }
+#now-playing[data-scroll] #now-playing-title { animation: track-title-scroll var(--track-scroll-duration) ease-in-out infinite alternate; }
+@keyframes track-title-scroll { 0%, 20% { transform: translateX(0); } 80%, 100% { transform: translateX(calc(-1 * var(--track-scroll-distance))); } }
+@media (prefers-reduced-motion: reduce) {
+  #now-playing { overflow-x: auto; }
+  #now-playing[data-scroll] #now-playing-title { animation: none; }
+}
 #now-playing[hidden] { display: none; }

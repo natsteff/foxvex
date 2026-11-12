@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.16 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.17 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -77,7 +77,7 @@ The current puzzle saves in your browser. Undo history lasts until you reload or
 
 The version appears during startup and in Settings. **Auto update** checks for a newer build when you open FoxVex or return to it. Use **Check for updates** in Settings to check manually.
 
-**Soundtrack** in Settings defaults to **Repeat (Random)**. Select one or more of the seven numbered songs in **Playlist**, switch to **Repeat (Sequential)**, or turn music **Off**. All songs are selected by default. Sequential playback follows the numbered order and skips unchecked songs. Random playback avoids consecutive repeats when multiple songs are selected. **Track Preview** lets you listen to any song with its **Preview/Pause** button, including while music is Off. Background music pauses during previews and resumes its previous playback state when you close Settings. **High quality audio** uses the original MP3s. The default uses smaller VBR copies, and quality changes apply when the next track or preview starts. Playlist and quality preferences save in your browser. Music and previews pause when the game goes into the background and resume when you return if they were playing. After a fresh launch, the logo shows a paused badge until your first tap starts music. Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.
+**Soundtrack** in Settings defaults to **Repeat (Random)**. Select one or more of the seven numbered songs in **Playlist**, switch to **Repeat (Sequential)**, or turn music **Off**. All songs are selected by default. Sequential playback follows the numbered order and skips unchecked songs. Random playback avoids consecutive repeats when multiple songs are selected. **Track Preview** lets you listen to any song with its **Preview/Pause** button, including while music is Off. Background music pauses during previews and resumes its previous playback state when you close Settings. **High quality audio** uses the original MP3s. The default uses smaller VBR copies, and quality changes apply when the next track or preview starts. The current track appears below the play area. Double-tap or double-click its name to skip to the next selected song, or focus it and press Enter or Space. Long titles scroll, with manual scrolling available when reduced motion is enabled. Playlist and quality preferences save in your browser. Music and previews pause when the game goes into the background and resume when you return if they were playing. After a fresh launch, the logo shows a paused badge until your first tap starts music. Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.
 
 ## Run locally
 

@@ -70,12 +70,15 @@
           <div id="board" class="grid" role="group" aria-label="Play area"></div>
           <span class="grid-label" aria-hidden="true"><span>PLAY</span><span>AREA</span></span>
         </div>
+        <button id="now-playing" type="button" title="Double-tap to skip to the next track. Use Enter or Space with a keyboard." hidden>
+          <span id="now-playing-title" aria-live="polite"></span>
+        </button>
       </section>
       <section class="panel tray-panel" aria-labelledby="tray-label">
         <header class="panel-heading">
           <h2 id="tray-label" class="visually-hidden">Tile tray</h2>
           <div class="tray-heading-text">
-            <p id="now-playing" aria-live="polite" hidden></p>
+            <span id="edge-tile-legend" hidden>Cheat Mode Enabled</span>
             <p id="status" role="status"></p>
           </div>
           <span id="remaining" class="count"></span>
@@ -96,7 +99,6 @@
             </div>
           </section>
         </div>
-        <p id="edge-tile-legend" hidden>Edge Tile (Cheat Mode Enabled)</p>
       </section>
       <div id="render-layer" aria-hidden="true"></div>
     </div>
