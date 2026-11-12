@@ -45,6 +45,9 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   let previewSession = false;
   let previewLoading = false;
   let resumeAfterPreview = false;
+  let backgrounded = document.hidden;
+  let resumeMusicOnReturn = false;
+  let resumePreviewOnReturn = false;
   let lastTap: number | undefined;
   const initialIndex = mode.value === 'random' ? Math.floor(Math.random() * selectedIds.length) : 0;
   const savedTrackId = read(trackKey);
@@ -87,7 +90,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   }
 
   function playTrack(startNew = false) {
-    if (mode.value === 'off' || pausedByPlayer || previewSession) return;
+    if (backgrounded || document.hidden || mode.value === 'off' || pausedByPlayer || previewSession) return;
     if (startNew || !audio.getAttribute('src')) audio.src = sourceFor(currentId);
     if (!audio.paused) return;
     const source = audio.src;
@@ -154,6 +157,11 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
       previewSession = true;
       audio.pause();
     }
+    playPreview();
+  });
+
+  function playPreview() {
+    if (backgrounded || document.hidden) return;
     previewStatus.hidden = true;
     const source = sourceFor(track.value);
     if (previewAudio.src !== source || previewAudio.error) previewAudio.src = source;
@@ -166,7 +174,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
       previewLoading = false;
       updatePreviewButton();
     });
-  });
+  }
   function updatePreviewButton() {
     preview.textContent = previewLoading ? 'Loading…' : previewAudio.paused ? 'Preview' : 'Pause';
   }
@@ -240,6 +248,34 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     write(trackKey, currentId);
     playTrack(true);
   });
+
+  function pauseForBackground() {
+    if (backgrounded) return;
+    backgrounded = true;
+    resumeMusicOnReturn = !audio.paused && mode.value !== 'off' && !pausedByPlayer;
+    resumePreviewOnReturn = !previewAudio.paused;
+    audio.pause();
+    previewAudio.pause();
+    setLoading(false);
+  }
+
+  function resumeFromBackground() {
+    if (!backgrounded || document.hidden) return;
+    backgrounded = false;
+    const resumeMusic = resumeMusicOnReturn;
+    const resumePreview = resumePreviewOnReturn;
+    resumeMusicOnReturn = false;
+    resumePreviewOnReturn = false;
+    if (resumePreview && previewSession && dialog.open) playPreview();
+    if (resumeMusic) playTrack();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseForBackground();
+    else resumeFromBackground();
+  });
+  window.addEventListener('pagehide', pauseForBackground);
+  window.addEventListener('pageshow', resumeFromBackground);
 
   function startFromInteraction(event: Event) {
     if (!event.isTrusted || event.composedPath().includes(toggle)) return;
