@@ -743,7 +743,6 @@ matchingAssistant.addEventListener('change', () => {
   placementHelp.textContent = assistantDescriptions[mode];
   updateHowToPlay();
   render();
-  announce(placementHelp.textContent);
 });
 doubleTapAction.addEventListener('change', () => {
   lastTap = null;

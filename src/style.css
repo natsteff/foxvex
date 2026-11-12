@@ -244,3 +244,7 @@ dialog form, .dialog-actions { display: flex; justify-content: flex-end; gap: 8p
 #soundtrack-loading[hidden] { display: none; }
 @keyframes song-loading-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 @media (prefers-reduced-motion: reduce) { #soundtrack-loading { animation: none; } }
+
+.tray-heading-text { min-width: 0; }
+#now-playing { margin: 0 0 3px; color: var(--accent); font-weight: 600; overflow-wrap: anywhere; }
+#now-playing[hidden] { display: none; }

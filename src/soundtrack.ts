@@ -22,6 +22,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   const toggle = document.querySelector<HTMLButtonElement>('#soundtrack-toggle')!;
   const wordmark = document.querySelector<HTMLImageElement>('.wordmark')!;
   const loading = document.querySelector<HTMLSpanElement>('#soundtrack-loading')!;
+  const nowPlaying = document.querySelector<HTMLParagraphElement>('#now-playing')!;
   const standardLogo = wordmark.src;
   const musicLogo = new URL('./assets/foxvex-wordmark-music.png', import.meta.url).href;
   const modeKey = 'foxvex.soundtrack-mode.v1';
@@ -75,6 +76,10 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     const action = mode.value === 'off' ? 'Enable' : audio.paused ? 'Play' : 'Pause';
     toggle.setAttribute('aria-label', `${action} FoxVex soundtrack`);
     toggle.toggleAttribute('data-paused', mode.value !== 'off' && audio.paused);
+    nowPlaying.hidden = mode.value === 'off' || !audio.getAttribute('src');
+    const currentTrack = tracks.find(item => item.id === currentId)!;
+    nowPlaying.textContent = `♪ ${currentTrack.name}`;
+    nowPlaying.setAttribute('aria-label', `Soundtrack: ${currentTrack.name}`);
   }
 
   function updateControls() {
@@ -96,6 +101,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     const source = audio.src;
     if (audio.error) audio.load();
     setLoading(true);
+    updateToggleLabel();
     void audio.play().catch((error: DOMException) => {
       if (mode.value === 'off' || previewSession || audio.src !== source || error.name === 'AbortError') return;
       setLoading(false);

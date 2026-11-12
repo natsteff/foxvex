@@ -74,7 +74,10 @@
       <section class="panel tray-panel" aria-labelledby="tray-label">
         <header class="panel-heading">
           <h2 id="tray-label" class="visually-hidden">Tile tray</h2>
-          <p id="status" role="status"></p>
+          <div class="tray-heading-text">
+            <p id="now-playing" aria-live="polite" hidden></p>
+            <p id="status" role="status"></p>
+          </div>
           <span id="remaining" class="count"></span>
         </header>
         <div class="grid-frame">
