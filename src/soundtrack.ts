@@ -71,7 +71,7 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   function updateToggleLabel() {
     const action = mode.value === 'off' ? 'Enable' : audio.paused ? 'Play' : 'Pause';
     toggle.setAttribute('aria-label', `${action} FoxVex soundtrack`);
-    toggle.toggleAttribute('data-paused', pausedByPlayer);
+    toggle.toggleAttribute('data-paused', mode.value !== 'off' && audio.paused);
   }
 
   function updateControls() {
@@ -179,7 +179,6 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
   }
   for (const event of ['waiting', 'stalled']) {
     previewAudio.addEventListener(event, () => {
-      if (event === 'pause' && !previewAudio.paused) return;
       previewLoading = !previewAudio.paused;
       updatePreviewButton();
     });
@@ -242,16 +241,18 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     playTrack(true);
   });
 
-  document.addEventListener('click', event => {
-    if (!event.isTrusted || event.composedPath().includes(toggle) || dialog.open) return;
+  function startFromInteraction(event: Event) {
+    if (!event.isTrusted || event.composedPath().includes(toggle)) return;
     lastTap = undefined;
     playTrack();
-  });
-  document.querySelector('#arena')!.addEventListener('pointerup', event => {
-    if (event.isTrusted) playTrack();
-  });
+  }
+
+  // Capture gestures before the game canvas can stop their propagation.
+  for (const event of ['click', 'pointerup', 'touchend']) {
+    document.addEventListener(event, startFromInteraction, { capture: true, passive: true });
+  }
   document.addEventListener('keydown', event => {
-    if (event.isTrusted && !dialog.open && event.target !== toggle && (event.key === 'Enter' || event.key === ' ')) playTrack();
-  });
+    if (event.target !== toggle && (event.key === 'Enter' || event.key === ' ')) startFromInteraction(event);
+  }, { capture: true });
   updateControls();
 }
