@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.12 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.13 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -18,6 +18,8 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 - **Lock In and Pencil In** let you double-tap a placed tile to lock it in place or flag a tentative placement with a question mark.
 - **Local saves** let you resume a puzzle in the same browser, including locked and penciled-in tiles. You can also undo moves or reveal the solution.
 - **Puzzle completion** shows your move count and a **Next Puzzle** button. Solve in one move per tile to earn a perfect-game badge and confetti.
+- **Soundtrack** lets you choose which songs to include, preview tracks in Settings, and play your playlist in sequential or random order. You can also turn the music off or enable high-quality audio.
+  - For the music tracks, I was inspired by a game I loved from 1997 called 'Acid Tetris' which had great gameplay and a synth pad based music playlist, especially the track 'Continuum'. If you too remember this or want to give it a try, you can now play it online at [Acid Tetris](https://www.playdosgames.com/play/acid-tetris/).
 
 FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. Auto layout stacks the board above the tray in portrait, including on tablets, and puts the tray on the left in landscape. Settings also offers saved Stacked and Side by side preferences. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. Controller support and FOX Arcade validation are planned.
 
@@ -75,7 +77,7 @@ The current puzzle saves in your browser. Undo history lasts until you reload or
 
 The version appears during startup and in Settings. **Auto update** checks for a newer build when you open FoxVex or return to it. Use **Check for updates** in Settings to check manually.
 
-**Soundtrack** in Settings defaults to **Repeat (Random)**. Choose a track, switch to **Repeat (Sequential)**, or turn music **Off**. Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode. The alpha currently includes one test track, which loops in either repeat mode.
+**Soundtrack** in Settings defaults to **Repeat (Random)**. Select one or more of the seven numbered songs in **Playlist**, switch to **Repeat (Sequential)**, or turn music **Off**. All songs are selected by default. Sequential playback follows the numbered order and skips unchecked songs. Random playback avoids consecutive repeats when multiple songs are selected. **Track Preview** lets you listen to any song with its **Preview/Pause** button, including while music is Off. Background music pauses during previews and resumes its previous playback state when you close Settings. **High quality audio** uses the original MP3s. The default uses smaller VBR copies, and quality changes apply when the next track or preview starts. Playlist and quality preferences save in your browser. Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.
 
 ## Run locally
 

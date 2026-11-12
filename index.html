@@ -32,6 +32,7 @@
     <div class="bar-inner">
       <button id="soundtrack-toggle" class="wordmark-toggle" type="button" aria-label="Play FoxVex soundtrack">
         <img class="wordmark" src="/src/assets/foxvex-wordmark.png" width="720" height="240" alt="">
+        <span id="soundtrack-loading" role="status" hidden>Song loading…</span>
         <svg class="wordmark-pause" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
           <circle cx="11" cy="11" r="10.5" fill="#131826" fill-opacity=".94" stroke="currentColor"/>
           <rect x="7.4" y="6.6" width="2.7" height="8.8" rx=".65" fill="currentColor"/>
@@ -98,6 +99,7 @@
     </div>
   </main>
   <audio id="soundtrack-audio" preload="none" hidden></audio>
+  <audio id="soundtrack-preview-audio" preload="none" hidden></audio>
   <div id="confetti" aria-hidden="true"></div>
   <dialog id="mobile-guide" aria-labelledby="mobile-guide-heading">
     <h2 id="mobile-guide-heading">Playing on a phone or tablet?</h2>
@@ -156,8 +158,18 @@
         <option value="random" selected>Repeat (Random)</option>
         <option value="off">Off</option>
       </select>
-      <label class="soundtrack-track-label" for="soundtrack-track">Track</label>
-      <select id="soundtrack-track"></select>
+      <details class="soundtrack-playlist">
+        <summary>Playlist</summary>
+        <div id="soundtrack-playlist" role="group" aria-label="Playlist"></div>
+      </details>
+      <label class="cheat-setting"><input id="soundtrack-quality" type="checkbox"> High quality audio</label>
+      <p>Quality changes apply when the next track or preview starts.</p>
+      <label class="soundtrack-track-label" for="soundtrack-track">Track Preview</label>
+      <div class="soundtrack-preview">
+        <select id="soundtrack-track"></select>
+        <button id="soundtrack-preview" type="button">Preview</button>
+      </div>
+      <p id="soundtrack-preview-status" role="status" hidden></p>
       <p id="soundtrack-help">Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.</p>
       <p id="soundtrack-status" role="status" hidden></p>
     </div>
