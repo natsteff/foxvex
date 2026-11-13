@@ -4,6 +4,7 @@ import type { Area, Difficulty, Puzzle, Side, Size, Slot } from './puzzle';
 import { TileRenderer } from './renderer';
 import type { TilePosition } from './renderer';
 import { setupSoundtrack } from './soundtrack';
+import { setupShareMenu } from './share';
 
 const arena = document.querySelector<HTMLDivElement>('#arena')!;
 const layer = document.querySelector<HTMLDivElement>('#render-layer')!;
@@ -775,6 +776,7 @@ boardLayout.addEventListener('change', () => {
 });
 updateHowToPlay();
 setupSoundtrack(read, write);
+setupShareMenu();
 render();
 if (puzzle !== restored) save();
 announce(restored ? (isSolved(puzzle) ? 'Completed puzzle restored.' : 'Puzzle resumed.') : 'Pick any tile to begin.');

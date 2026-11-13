@@ -225,6 +225,23 @@
       <p id="play-cheat" hidden>Cheat Mode outlines edge tiles in cyan. Each lime notch marks a side that must face the outside of the board. The hints stay with the tile when you move it.</p>
       <p id="play-assistant"></p>
     </details>
+    <details class="setting-group">
+      <summary>How to add as an app</summary>
+      <p><strong>iPhone or iPad</strong> — Open FoxVex in Safari. Tap <strong>Share → Add to Home Screen</strong>, turn on <strong>Open as Web App</strong> if offered, then tap <strong>Add</strong>.</p>
+      <p><strong>Android</strong> — Open FoxVex in Chrome. Tap <strong>⋮ → Install and create shortcut</strong> or <strong>Add to Home screen</strong>, then follow the installation prompts.</p>
+      <p>Open the <strong>FoxVex</strong> fox icon from your Home Screen. Play in portrait or landscape. Layout options are available in Settings.</p>
+    </details>
+    <div class="setting-group">
+      <details id="share-menu">
+        <summary>Share</summary>
+        <div id="share-choices">
+          <button type="button" data-share="game">Share game</button>
+          <button type="button" data-share="soundtrack">Share soundtrack</button>
+        </div>
+      </details>
+      <p id="share-status" role="status" aria-live="polite"></p>
+      <input id="share-link" aria-label="Link to copy" type="url" readonly hidden>
+    </div>
     <div class="setting-group">
       <strong>FoxVex v<span id="game-version">__FOXVEX_VERSION__</span> · Alpha</strong>
       <label class="update-toggle"><input id="auto-update" type="checkbox" checked> Auto update</label>
