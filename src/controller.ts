@@ -21,6 +21,7 @@ export function controllerActions(pad: Pick<Gamepad, 'buttons' | 'axes'>) {
 }
 
 export function setupController(actions: {
+  switchGrid: () => void;
   cancelTile: () => void;
   markTile: () => void;
   startMusic: () => void;
@@ -99,8 +100,11 @@ export function setupController(actions: {
     const active = document.activeElement as HTMLElement | null;
     const dialog = activeDialog();
     switch (action) {
-      case 'previous': moveControl(-1); break;
-      case 'next': moveControl(1); break;
+      case 'previous':
+      case 'next':
+        if (!dialog && active?.matches('.cell')) actions.switchGrid();
+        else moveControl(action === 'previous' ? -1 : 1);
+        break;
       case 'left':
       case 'right':
       case 'up':

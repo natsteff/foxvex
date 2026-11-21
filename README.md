@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.20 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.21 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -93,11 +93,13 @@ Connect a controller and press a button to make it available to the browser. The
 | B / right face button | Cancel a tile selection, collapse a menu section, or close the current dialog |
 | X / left face button | Lock/unlock or pencil-mark the focused tile according to Settings |
 | Y / top face button | Undo |
-| LB / RB | Previous/next control or grid |
+| LB / RB | Switch directly between tray and play area at the same row/column; previous/next control in menus |
 | LT | Pause/resume music or a track preview |
 | RT | Skip to the next selected song |
 | Start / Menu | Open Settings, or go back when a dialog is open |
 | Back / Select | Open New Puzzle |
+
+To place a tile, focus it in the tray and press **A**, press **LB or RB** to switch to the play area, move to the destination, and press **A** again. **B** cancels the carried tile. Both shoulder buttons switch directly between grids while a tile slot is focused. Move up from the top row to reach the controls above a grid.
 
 In menus, use up/down to move between controls and left/right to change a focused option. Controller polling pauses when the page loses focus or goes into the background. Release held controls after returning or reconnecting before using them again. A browser may require a tap or keypress to enable sound or native sharing. Physical controller and FOX Arcade acceptance checks are pending.
 

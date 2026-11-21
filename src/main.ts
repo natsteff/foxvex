@@ -651,7 +651,9 @@ arena.addEventListener('click', event => {
   if (!selected) {
     if (occupant === null) return;
     selected = to;
-    announce('Tile picked up. Choose a destination.');
+    announce(document.body.classList.contains('controller-active')
+      ? 'Tile picked up. LB/RB switches grids; A places it.'
+      : 'Tile picked up. Choose a destination.');
   } else if (sameSlot(selected, to)) {
     selected = null;
     announce('Selection canceled.');
@@ -778,6 +780,15 @@ boardLayout.addEventListener('change', () => {
 updateHowToPlay();
 const soundtrack = setupSoundtrack(read, write);
 setupController({
+  switchGrid: () => {
+    const slot = slotFor(document.activeElement);
+    if (!slot) return;
+    const destination: Slot = { area: slot.area === 'tray' ? 'board' : 'tray', index: slot.index };
+    markFocus(destination);
+    const cell = cellAt(destination);
+    cell.focus({ preventScroll: true });
+    cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  },
   cancelTile: () => {
     if (!selected) return;
     selected = null;
