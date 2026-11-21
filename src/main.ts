@@ -496,6 +496,13 @@ function markFocus(slot: Slot) {
   cellAt(slot).tabIndex = 0;
 }
 
+function focusSlot(slot: Slot) {
+  markFocus(slot);
+  const cell = cellAt(slot);
+  cell.focus({ preventScroll: true });
+  cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
 function markTile(slot: Slot) {
   const action = doubleTapAction.value;
   if (action !== 'lock' && action !== 'pencil') return;
@@ -644,6 +651,8 @@ arena.addEventListener('click', event => {
   const to = slotFor(event.target);
   if (!to) return;
   const occupant = puzzle[to.area][to.index];
+  const controller = document.body.classList.contains('controller-active');
+  let focusAfter: Slot | undefined;
   if (isLocked(puzzle, to)) {
     announce(unlockMessage, 'error');
     return;
@@ -651,18 +660,21 @@ arena.addEventListener('click', event => {
   if (!selected) {
     if (occupant === null) return;
     selected = to;
-    announce(document.body.classList.contains('controller-active')
-      ? 'Tile picked up. LB/RB switches grids; A places it.'
-      : 'Tile picked up. Choose a destination.');
+    announce(controller ? 'Tile picked up. Choose a play-area slot and press A.' : 'Tile picked up. Choose a destination.');
+    if (controller && to.area === 'tray') focusAfter = { area: 'board', index: to.index };
   } else if (sameSlot(selected, to)) {
     selected = null;
     announce('Selection canceled.');
   } else {
     const next = move(puzzle, selected, to, matchingAssistant.value !== 'prevent');
-    if (next) commit(next, occupant === null ? 'Tile moved.' : 'Tiles swapped.');
-    else announce('Those edges don’t match. Choose another slot.', 'error');
+    if (next) {
+      const trayIndex = selected.area === 'tray' ? selected.index : to.index;
+      commit(next, occupant === null ? 'Tile moved.' : 'Tiles swapped.');
+      if (controller && to.area === 'board' && victory.hidden) focusAfter = { area: 'tray', index: trayIndex };
+    } else announce('Those edges don’t match. Choose another slot.', 'error');
   }
   render();
+  if (focusAfter) focusSlot(focusAfter);
 });
 
 arena.addEventListener('keydown', event => {
@@ -784,10 +796,7 @@ setupController({
     const slot = slotFor(document.activeElement);
     if (!slot) return;
     const destination: Slot = { area: slot.area === 'tray' ? 'board' : 'tray', index: slot.index };
-    markFocus(destination);
-    const cell = cellAt(destination);
-    cell.focus({ preventScroll: true });
-    cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    focusSlot(destination);
   },
   cancelTile: () => {
     if (!selected) return;
