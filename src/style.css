@@ -261,3 +261,6 @@ dialog form, .dialog-actions { display: flex; justify-content: flex-end; gap: 8p
 #share-choices button { flex: 1; white-space: nowrap; touch-action: manipulation; }
 #share-status:empty { display: none; }
 #share-link { width: 100%; margin-top: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; color: inherit; background: #222a3e; font: inherit; -webkit-user-select: text; user-select: text; }
+
+.controller-active :focus { outline: 3px solid var(--accent); outline-offset: 2px; }
+.controller-active .cell:focus { outline-offset: 1px; background: #344762; }

@@ -320,4 +320,12 @@ export function setupSoundtrack(read: (key: string) => string | null, write: (ke
     if (event.target !== toggle && (event.key === 'Enter' || event.key === ' ')) startFromInteraction(event);
   }, { capture: true });
   updateControls();
+  return {
+    play: () => playTrack(),
+    toggle: () => {
+      if (previewSession) preview.click();
+      else toggle.click();
+    },
+    skip: () => nowPlaying.click(),
+  };
 }

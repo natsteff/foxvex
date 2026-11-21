@@ -5,6 +5,7 @@ import { TileRenderer } from './renderer';
 import type { TilePosition } from './renderer';
 import { setupSoundtrack } from './soundtrack';
 import { setupShareMenu } from './share';
+import { setupController } from './controller';
 
 const arena = document.querySelector<HTMLDivElement>('#arena')!;
 const layer = document.querySelector<HTMLDivElement>('#render-layer')!;
@@ -775,7 +776,22 @@ boardLayout.addEventListener('change', () => {
   scheduleLayout();
 });
 updateHowToPlay();
-setupSoundtrack(read, write);
+const soundtrack = setupSoundtrack(read, write);
+setupController({
+  cancelTile: () => {
+    if (!selected) return;
+    selected = null;
+    render();
+    announce('Selection canceled.');
+  },
+  markTile: () => {
+    const slot = slotFor(document.activeElement);
+    if (slot) markTile(slot);
+  },
+  startMusic: soundtrack.play,
+  toggleMusic: soundtrack.toggle,
+  skipMusic: soundtrack.skip,
+});
 setupShareMenu();
 render();
 if (puzzle !== restored) save();

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.19 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.20 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -21,7 +21,7 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 - **Soundtrack** is available on [Suno](https://suno.com/playlist/7bfd503f-821d-4b35-8c35-1e106e22502a). FoxVex lets you choose which songs to include, preview tracks in Settings, and play your playlist in sequential or random order. You can also turn the music off or enable high-quality audio.
   - For the music tracks, I was inspired by a game I loved from 1997 called 'Acid Tetris' which had great gameplay and a synth pad based music playlist, especially the track 'Continuum'. If you too remember this or want to give it a try, you can now play it online at [Acid Tetris](https://www.playdosgames.com/play/acid-tetris/).
 
-FoxVex supports mouse and keyboard on desktop and touch on phones and tablets. Auto layout stacks the board above the tray in portrait, including on tablets, and puts the tray on the left in landscape. Settings also offers saved Stacked and Side by side preferences. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. Controller support and FOX Arcade validation are planned.
+FoxVex supports mouse and keyboard on desktop, touch on phones and tablets, and standard browser gamepads. Auto layout stacks the board above the tray in portrait, including on tablets, and puts the tray on the left in landscape. Settings also offers saved Stacked and Side by side preferences. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. FOX Arcade hardware validation is pending.
 
 ## Add FoxVex to your Home Screen
 
@@ -80,6 +80,26 @@ The version appears during startup and in Settings. **Auto update** checks for a
 **Soundtrack** in Settings defaults to **Repeat (Random)**. Select one or more of the seven numbered songs in **Playlist**, switch to **Repeat (Sequential)**, or turn music **Off**. All songs are selected by default. Sequential playback follows the numbered order and skips unchecked songs. Random playback avoids consecutive repeats when multiple songs are selected. **Track Preview** lets you listen to any song with its **Preview/Pause** button, including while music is Off. Background music pauses during previews and resumes its previous playback state when you close Settings. **High quality audio** uses the original MP3s. The default uses smaller VBR copies, and quality changes apply when the next track or preview starts. The current track appears below the play area. Double-tap or double-click its name to skip to the next selected song, or focus it and press Enter or Space. Long titles scroll, with manual scrolling available when reduced motion is enabled. Playlist and quality preferences save in your browser. Music and previews pause when the game goes into the background and resume when you return if they were playing. After a fresh launch, the logo shows a paused badge until your first tap starts music. Tap the FoxVex logo to pause or resume music. Double-tap it to turn music off or restore your last repeat mode.
 
 Use **Settings → Share** to share the game or its Suno soundtrack. Supported browsers open the native share sheet. Other browsers copy the link or display it for manual copying.
+
+## Controller controls
+
+Connect a controller and press a button to make it available to the browser. The focused tile or menu control has a gold outline. Controls use the browser’s standard Xbox-style button positions, including equivalent PlayStation or other mapped controllers.
+
+| Control | Action |
+| --- | --- |
+| D-pad / left stick | Move through tiles or menu controls |
+| Right stick | Scroll the game or menu |
+| A / bottom face button | Pick up/drop a tile, activate a button or checkbox, expand a section, or cycle an option |
+| B / right face button | Cancel a tile selection, collapse a menu section, or close the current dialog |
+| X / left face button | Lock/unlock or pencil-mark the focused tile according to Settings |
+| Y / top face button | Undo |
+| LB / RB | Previous/next control or grid |
+| LT | Pause/resume music or a track preview |
+| RT | Skip to the next selected song |
+| Start / Menu | Open Settings, or go back when a dialog is open |
+| Back / Select | Open New Puzzle |
+
+In menus, use up/down to move between controls and left/right to change a focused option. Controller polling pauses when the page loses focus or goes into the background. Release held controls after returning or reconnecting before using them again. A browser may require a tap or keypress to enable sound or native sharing. Physical controller and FOX Arcade acceptance checks are pending.
 
 ## Run locally
 
