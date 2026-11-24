@@ -21,7 +21,7 @@ Inspired by classic TetraVex-style puzzles, FoxVex brings traditional number-mat
 - **Soundtrack** is available on [Suno](https://suno.com/playlist/7bfd503f-821d-4b35-8c35-1e106e22502a). FoxVex lets you choose which songs to include, preview tracks in Settings, and play your playlist in sequential or random order. You can also turn the music off or enable high-quality audio.
   - For the music tracks, I was inspired by a game I loved from 1997 called 'Acid Tetris' which had great gameplay and a synth pad based music playlist, especially the track 'Continuum'. If you too remember this or want to give it a try, you can now play it online at [Acid Tetris](https://www.playdosgames.com/play/acid-tetris/).
 
-FoxVex supports mouse and keyboard on desktop, touch on phones and tablets, and standard browser gamepads. Auto layout stacks the board above the tray in portrait, including on tablets, and puts the tray on the left in landscape. Settings also offers saved Stacked and Side by side preferences. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen. FOX Arcade hardware validation is pending.
+FoxVex supports mouse and keyboard on desktop, touch on phones and tablets, and standard browser gamepads. Auto layout stacks the board above the tray in portrait, including on tablets, and puts the tray on the left in landscape. Settings also offers saved Stacked and Side by side preferences. On small screens, choose larger tiles with scrolling or smaller tiles that fit more of the puzzle on screen.
 
 ## Add FoxVex to your Home Screen
 
@@ -101,7 +101,7 @@ Connect a controller and press a button to make it available to the browser. The
 
 To place a tile, focus it in the tray and press **A**. Focus switches automatically to the play area. Move to the destination and press **A** again. After a successful placement or swap, focus returns to the original tray slot for your next tile. Rejected moves keep focus in the play area so you can choose another destination. Completing the puzzle focuses **Next Puzzle**. **B** cancels the carried tile. Both shoulder buttons switch directly between grids while a tile slot is focused. Move up from the top row to reach the controls above a grid.
 
-In menus, use up/down to move between controls and left/right to change a focused option. Controller polling pauses when the page loses focus or goes into the background. Release held controls after returning or reconnecting before using them again. A browser may require a tap or keypress to enable sound or native sharing. Physical controller and FOX Arcade acceptance checks are pending.
+In menus, use up/down to move between controls and left/right to change a focused option. Controller polling pauses when the page loses focus or goes into the background. Release held controls after returning or reconnecting before using them again. A browser may require a tap or keypress to enable sound or native sharing. Controller testing and feedback use a custom Batocera installation with FoxVex added under **Ports**.
 
 ## Run locally
 
