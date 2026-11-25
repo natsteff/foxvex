@@ -21,6 +21,7 @@ export function controllerActions(pad: Pick<Gamepad, 'buttons' | 'axes'>) {
 }
 
 export function setupController(actions: {
+  layoutChanged: () => void;
   switchGrid: () => void;
   cancelTile: () => void;
   markTile: () => void;
@@ -29,6 +30,19 @@ export function setupController(actions: {
   skipMusic: () => void;
 }) {
   const status = document.querySelector<HTMLElement>('#controller-status')!;
+  const hints = document.querySelector<HTMLElement>('#controller-hints')!;
+  const context = document.querySelector<HTMLElement>('#controller-context')!;
+  const shortcuts = document.querySelector<HTMLElement>('#controller-shortcuts')!;
+  const controllerLayout = document.documentElement.classList.contains('fullscreen-layout');
+  if (controllerLayout) document.body.classList.add('controller-active');
+
+  function reserveHintSpace() {
+    const inGame = !hints.hidden && hints.parentElement === document.body;
+    document.body.classList.toggle('has-controller-hints', inGame);
+    document.documentElement.style.setProperty('--controller-hints-height', `${inGame ? hints.offsetHeight : 0}px`);
+    actions.layoutChanged();
+  }
+  new ResizeObserver(reserveHintSpace).observe(hints);
   const held = new Map<string, Map<ControllerAction, number>>();
   let frame = 0;
   let focused = document.hasFocus();
@@ -37,6 +51,30 @@ export function setupController(actions: {
   function activeDialog() {
     return Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).at(-1);
   }
+
+  function updateHints(connected: boolean) {
+    const dialog = activeDialog();
+    const parent = dialog ?? document.body;
+    const changed = hints.hidden === (connected || controllerLayout) || hints.parentElement !== parent;
+    if (hints.parentElement !== parent) parent.append(hints);
+    hints.hidden = !connected && !controllerLayout;
+    const inGrid = (document.activeElement as HTMLElement | null)?.matches('.cell');
+    const message = dialog
+      ? 'D-pad Move · A Activate · B Back · Left/Right Change option · LB/RB Move'
+      : inGrid
+        ? 'D-pad Move · A Pick up/place · B Cancel · LB/RB Switch grids · X Mark · Y Undo'
+        : 'D-pad Move · A Activate · LB/RB Move · Start Settings · Select New puzzle';
+    if (context.textContent !== message) context.textContent = message;
+    shortcuts.textContent = dialog
+      ? 'LT Music/preview · RT Next track · Right stick Scroll'
+      : 'Start Settings · Select New puzzle · LT Music · RT Next track · Right stick Scroll';
+    if (changed) reserveHintSpace();
+    if (controllerLayout && !dialog && document.activeElement === document.body) {
+      const tray = document.querySelector<HTMLElement>('#tray .cell[tabindex="0"]');
+      if (tray && !tray.closest('[inert]')) focus(tray);
+    }
+  }
+  if (controllerLayout) updateHints(false);
 
   function controls() {
     const scope = activeDialog() ?? document.body;
@@ -151,9 +189,11 @@ export function setupController(actions: {
     try { pads = Array.from(navigator.getGamepads()); }
     catch {
       status.textContent = 'Controller access is unavailable in this browser.';
+      updateHints(false);
       return;
     }
     const connected = pads.filter((pad): pad is Gamepad => pad !== null && pad.connected);
+    updateHints(connected.length > 0);
     const message = connected.length ? `Connected: ${connected.map(pad => pad.id).join(', ')}` : 'Connect a controller and press a button to begin.';
     if (status.textContent !== message) status.textContent = message;
     const elapsed = lastFrame ? Math.min(50, time - lastFrame) : 16;
@@ -221,5 +261,8 @@ export function setupController(actions: {
   });
   window.addEventListener('gamepadconnected', start);
   if (typeof navigator.getGamepads === 'function') start();
-  else status.textContent = 'Controller support is unavailable in this browser.';
+  else {
+    status.textContent = 'Controller support is unavailable in this browser.';
+    updateHints(false);
+  }
 }

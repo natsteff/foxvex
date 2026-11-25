@@ -277,7 +277,8 @@ function measureLayout(layout: BoardLayout) {
     const style = getComputedStyle(panel);
     return panel.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - gutters;
   });
-  return Math.floor(Math.min(430, available, ...widths));
+  const maximumGrid = document.documentElement.classList.contains('fullscreen-layout') ? Infinity : 430;
+  return Math.floor(Math.min(maximumGrid, available, ...widths));
 }
 
 function resize() {
@@ -792,6 +793,7 @@ boardLayout.addEventListener('change', () => {
 updateHowToPlay();
 const soundtrack = setupSoundtrack(read, write);
 setupController({
+  layoutChanged: scheduleLayout,
   switchGrid: () => {
     const slot = slotFor(document.activeElement);
     if (!slot) return;

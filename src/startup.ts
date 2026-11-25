@@ -1,6 +1,9 @@
 import './style.css';
 import { checkForUpdate } from './updates';
 
+const fullscreenLayout = new URLSearchParams(location.search).get('fullscreen') === '1';
+document.documentElement.classList.toggle('fullscreen-layout', fullscreenLayout);
+
 const startup = document.querySelector<HTMLElement>('#startup-screen')!;
 const startupStatus = document.querySelector<HTMLParagraphElement>('#startup-status')!;
 const retry = document.querySelector<HTMLAnchorElement>('#startup-retry')!;

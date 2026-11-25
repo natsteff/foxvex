@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.22 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.23 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -102,6 +102,16 @@ Connect a controller and press a button to make it available to the browser. The
 To place a tile, focus it in the tray and press **A**. Focus switches automatically to the play area. Move to the destination and press **A** again. After a successful placement or swap, focus returns to the original tray slot for your next tile. Rejected moves keep focus in the play area so you can choose another destination. Completing the puzzle focuses **Next Puzzle**. **B** cancels the carried tile. Both shoulder buttons switch directly between grids while a tile slot is focused. Move up from the top row to reach the controls above a grid.
 
 In menus, use up/down to move between controls and left/right to change a focused option. Controller polling pauses when the page loses focus or goes into the background. Release held controls after returning or reconnecting before using them again. A browser may require a tap or keypress to enable sound or native sharing. Controller testing and feedback use a custom Batocera installation with FoxVex added under **Ports**.
+
+## Fullscreen launcher layout
+
+Use [FoxVex with fullscreen layout](https://natsteff.github.io/foxvex/?fullscreen=1) for the Batocera Ports launcher. The exact query parameter `fullscreen=1` removes the outer width limits and sizes the grids to the available viewport. It also starts controller mode, focuses the tray, and shows the bottom button guide. Essential controls remain available and smaller screens can scroll. Without this parameter, FoxVex uses its normal responsive layout. A connected controller also shows the button guide in the normal layout.
+
+Chromium’s kiosk flag hides its browser controls and supplies actual fullscreen. For example, launch it with this command.
+
+```sh
+chromium --kiosk "https://natsteff.github.io/foxvex/?fullscreen=1"
+```
 
 ## Run locally
 
