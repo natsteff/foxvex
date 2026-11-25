@@ -6,6 +6,7 @@ import type { TilePosition } from './renderer';
 import { setupSoundtrack } from './soundtrack';
 import { setupShareMenu } from './share';
 import { setupController } from './controller';
+import { preferredControllerSlot } from './controller-focus';
 
 const arena = document.querySelector<HTMLDivElement>('#arena')!;
 const layer = document.querySelector<HTMLDivElement>('#render-layer')!;
@@ -662,7 +663,7 @@ arena.addEventListener('click', event => {
     if (occupant === null) return;
     selected = to;
     announce(controller ? 'Tile picked up. Choose a play-area slot and press A.' : 'Tile picked up. Choose a destination.');
-    if (controller && to.area === 'tray') focusAfter = { area: 'board', index: to.index };
+    if (controller && to.area === 'tray') focusAfter = preferredControllerSlot(puzzle, 'board', to.index);
   } else if (sameSlot(selected, to)) {
     selected = null;
     announce('Selection canceled.');
@@ -671,7 +672,7 @@ arena.addEventListener('click', event => {
     if (next) {
       const trayIndex = selected.area === 'tray' ? selected.index : to.index;
       commit(next, occupant === null ? 'Tile moved.' : 'Tiles swapped.');
-      if (controller && to.area === 'board' && victory.hidden) focusAfter = { area: 'tray', index: trayIndex };
+      if (controller && to.area === 'board' && victory.hidden) focusAfter = preferredControllerSlot(puzzle, 'tray', trayIndex);
     } else announce('Those edges don’t match. Choose another slot.', 'error');
   }
   render();
@@ -794,6 +795,11 @@ updateHowToPlay();
 const soundtrack = setupSoundtrack(read, write);
 setupController({
   layoutChanged: scheduleLayout,
+  focusTray: () => {
+    if (!cells.tray.length || arena.closest('[inert]')) return;
+    const index = cells.tray.findIndex(cell => cell.tabIndex === 0);
+    focusSlot(preferredControllerSlot(puzzle, 'tray', Math.max(0, index)));
+  },
   switchGrid: () => {
     const slot = slotFor(document.activeElement);
     if (!slot) return;

@@ -22,6 +22,7 @@ export function controllerActions(pad: Pick<Gamepad, 'buttons' | 'axes'>) {
 
 export function setupController(actions: {
   layoutChanged: () => void;
+  focusTray: () => void;
   switchGrid: () => void;
   cancelTile: () => void;
   markTile: () => void;
@@ -70,8 +71,7 @@ export function setupController(actions: {
       : 'Start Settings · Select New puzzle · LT Music · RT Next track · Right stick Scroll';
     if (changed) reserveHintSpace();
     if (controllerLayout && !dialog && document.activeElement === document.body) {
-      const tray = document.querySelector<HTMLElement>('#tray .cell[tabindex="0"]');
-      if (tray && !tray.closest('[inert]')) focus(tray);
+      actions.focusTray();
     }
   }
   if (controllerLayout) updateHints(false);
@@ -132,7 +132,8 @@ export function setupController(actions: {
   function act(action: ControllerAction) {
     document.body.classList.add('controller-active');
     if (!controls().includes(document.activeElement as HTMLElement) && !(document.activeElement as HTMLElement)?.matches('.cell')) {
-      focus(activeDialog() ? controls()[0] : document.querySelector<HTMLElement>('#tray .cell[tabindex="0"]')!);
+      if (activeDialog()) focus(controls()[0]);
+      else actions.focusTray();
     }
     if (action !== 'music' && action !== 'skip') actions.startMusic();
     const active = document.activeElement as HTMLElement | null;
