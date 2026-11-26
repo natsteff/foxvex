@@ -662,8 +662,13 @@ arena.addEventListener('click', event => {
   if (!selected) {
     if (occupant === null) return;
     selected = to;
-    announce(controller ? 'Tile picked up. Choose a play-area slot and press A.' : 'Tile picked up. Choose a destination.');
-    if (controller && to.area === 'tray') focusAfter = preferredControllerSlot(puzzle, 'board', to.index);
+    announce(controller
+      ? `Tile picked up. Choose a ${to.area === 'tray' ? 'play-area' : 'tray'} slot and press A.`
+      : 'Tile picked up. Choose a destination.');
+    if (controller) {
+      const area = to.area === 'tray' ? 'board' : 'tray';
+      focusAfter = preferredControllerSlot(puzzle, area, to.index, true);
+    }
   } else if (sameSlot(selected, to)) {
     selected = null;
     announce('Selection canceled.');
@@ -804,7 +809,7 @@ setupController({
     const slot = slotFor(document.activeElement);
     if (!slot) return;
     const destination: Slot = { area: slot.area === 'tray' ? 'board' : 'tray', index: slot.index };
-    focusSlot(destination);
+    focusSlot(selected ? preferredControllerSlot(puzzle, destination.area, destination.index, true) : destination);
   },
   cancelTile: () => {
     if (!selected) return;

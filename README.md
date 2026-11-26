@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.24 Alpha"></a>
+  <a href="https://natsteff.github.io/foxvex/"><img src="docs/play-now.svg" width="280" alt="Play FoxVex now, version 0.1.25 Alpha"></a>
 </p>
 
 **Play FoxVex in your browser.** [Open the game](https://natsteff.github.io/foxvex/)
@@ -99,7 +99,7 @@ Connect a controller and press a button to make it available to the browser. The
 | Start / Menu | Open Settings, or go back when a dialog is open |
 | Back / Select | Open New Puzzle |
 
-To place a tile, focus it in the tray and press **A**. Focus switches automatically to the nearest empty play-area slot. Move to the destination and press **A** again. After a successful placement or swap, focus returns to the nearest remaining tray tile, keeping the original tray slot when it still contains a tile. Initial controller focus also prefers a remaining tile. If no preferred slot exists, focus stays available for rearranging tiles. Manual navigation still reaches every slot. Rejected moves keep focus in the play area so you can choose another destination. Completing the puzzle focuses **Next Puzzle**. **B** cancels the carried tile. Both shoulder buttons switch directly between grids while a tile slot is focused. Move up from the top row to reach the controls above a grid.
+To place a tile, focus it in the tray and press **A**. Focus switches automatically to the nearest empty play-area slot. Move to the destination and press **A** again. After a successful placement or swap, focus returns to the nearest remaining tray tile, keeping the original tray slot when it still contains a tile. Initial controller focus also prefers a remaining tile. If no preferred slot exists, focus stays available for rearranging tiles. Manual navigation still reaches every slot. Rejected moves keep focus in the play area so you can choose another destination. Completing the puzzle focuses **Next Puzzle**. **To return a tile to the tray**, focus an unlocked play-area tile and press **A**. Focus switches to a nearby empty tray slot; press **A** again to return it. You can still move within either grid or use **LB/RB** to switch grids while carrying a tile. Locked tiles must be unlocked with **X** first. **B** cancels the carried tile. Both shoulder buttons switch directly between grids while a tile slot is focused. Move up from the top row to reach the controls above a grid.
 
 In menus, use up/down to move between controls and left/right to change a focused option. Controller polling pauses when the page loses focus or goes into the background. Release held controls after returning or reconnecting before using them again. A browser may require a tap or keypress to enable sound or native sharing. Controller testing and feedback use a custom Batocera installation with FoxVex added under **Ports**.
 
